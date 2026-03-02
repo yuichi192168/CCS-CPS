@@ -20,8 +20,8 @@ export default function Dashboard() {
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="font-headline text-3xl font-bold tracking-tight text-primary">Nexus Dashboard</h1>
-              <p className="text-muted-foreground">Welcome back, Admin. Here is what's happening in the College today.</p>
+              <h1 className="font-headline text-3xl font-bold tracking-tight text-primary">System Dashboard</h1>
+              <p className="text-muted-foreground">Welcome to the CCS Comprehensive Profiling System. Here is what's happening in the College today.</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

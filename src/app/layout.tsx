@@ -4,7 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'CCS Nexus | Comprehensive Profiling System',
+  title: 'CCS Comprehensive Profiling System',
   description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies.',
 };
 

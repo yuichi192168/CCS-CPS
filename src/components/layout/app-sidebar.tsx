@@ -74,11 +74,11 @@ export function AppSidebar() {
       <SidebarHeader className="border-b px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <LayoutDashboard className="size-5" />
+            <GraduationCap className="size-5" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="font-headline font-bold text-lg tracking-tight">CCS Nexus</span>
-            <span className="text-xs text-muted-foreground">Comprehensive Profiling</span>
+            <span className="font-headline font-bold text-lg tracking-tight">CCS Profiling</span>
+            <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">Comprehensive System</span>
           </div>
         </div>
       </SidebarHeader>

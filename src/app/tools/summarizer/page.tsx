@@ -102,7 +102,7 @@ export default function SummarizerTool() {
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center text-center p-12 opacity-40">
                       <BookOpen className="h-16 w-16 mb-4" />
-                      <p className="max-w-xs italic">Summary will appear here once the text is processed by Nexus AI.</p>
+                      <p className="max-w-xs italic">Summary will appear here once the text is processed by the AI system.</p>
                     </div>
                   )}
                 </CardContent>
