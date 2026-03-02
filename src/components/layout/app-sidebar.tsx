@@ -12,6 +12,7 @@ import {
   Settings,
   Users,
   Wand2,
+  UserCircle,
 } from "lucide-react"
 
 import {
@@ -36,6 +37,12 @@ const navItems = [
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
+    roles: ["admin", "faculty", "student"],
+  },
+  {
+    title: "My Profile",
+    url: "/profile",
+    icon: UserCircle,
     roles: ["admin", "faculty", "student"],
   },
   {
@@ -76,12 +83,13 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { profile } = useUserProfile()
+  const { profile, loading } = useUserProfile()
 
   const filteredItems = React.useMemo(() => {
+    if (loading) return [];
     if (!profile) return navItems.filter(item => item.url === "/" || item.url === "/research" || item.url === "/events");
     return navItems.filter(item => item.roles.includes(profile.role));
-  }, [profile]);
+  }, [profile, loading]);
 
   return (
     <Sidebar collapsible="icon">
@@ -92,7 +100,7 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
             <span className="font-headline font-bold text-lg tracking-tight">CCS Profiling</span>
-            <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">Comprehensive System</span>
+            <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider leading-none">Comprehensive System</span>
           </div>
         </div>
       </SidebarHeader>
@@ -139,9 +147,9 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link href="/settings">
+              <Link href="/profile">
                 <Settings className="size-4" />
-                <span>System Settings</span>
+                <span>Account Settings</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

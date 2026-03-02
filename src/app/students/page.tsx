@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -8,30 +9,43 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Filter, Plus, MoreHorizontal, Loader2 } from "lucide-react"
+import { Search, Filter, Plus, MoreHorizontal, Loader2, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCollection, useFirestore, useUser } from "@/firebase"
-import { collection, query, orderBy, addDoc } from "firebase/firestore"
+import { useUserProfile } from "@/firebase/auth/use-user-profile"
+import { collection, query, orderBy, addDoc, deleteDoc, doc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function StudentsPage() {
   const db = useFirestore()
-  const { user } = useUser()
+  const { profile } = useUserProfile()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
   
+  const isAdmin = profile?.role === 'admin'
+
   const studentsQuery = useMemo(() => {
     if (!db) return null
     return query(collection(db, "students"), orderBy("name", "asc"))
   }, [db])
 
   const { data: students, loading, error } = useCollection(studentsQuery)
+
+  const filteredStudents = useMemo(() => {
+    if (!students) return []
+    return students.filter(s => 
+      s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      s.id.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [students, searchTerm])
 
   const handleAddStudent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -62,6 +76,21 @@ export default function StudentsPage() {
       })
   }
 
+  const handleDeleteStudent = (studentId: string) => {
+    const studentRef = doc(db, "students", studentId)
+    deleteDoc(studentRef)
+      .then(() => {
+        toast({ title: "Deleted", description: "Student record has been removed." })
+      })
+      .catch(async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: studentRef.path,
+          operation: "delete",
+        })
+        errorEmitter.emit("permission-error", permissionError)
+      })
+  }
+
   return (
     <>
       <AppSidebar />
@@ -75,74 +104,81 @@ export default function StudentsPage() {
                 <p className="text-muted-foreground">Manage and view comprehensive student academic records.</p>
               </div>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full sm:w-auto gap-2" disabled={!user}>
-                    <Plus className="h-4 w-4" />
-                    Enroll New Student
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <form onSubmit={handleAddStudent}>
-                    <DialogHeader>
-                      <DialogTitle>Enroll Student</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="studentId">Student ID</Label>
-                        <Input id="studentId" name="studentId" placeholder="2024-0001" required />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" name="name" placeholder="Juan Dela Cruz" required />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" name="email" type="email" placeholder="juan@pnc.edu.ph" required />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
+              {isAdmin && (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full sm:w-auto gap-2">
+                      <Plus className="h-4 w-4" />
+                      Enroll New Student
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <form onSubmit={handleAddStudent}>
+                      <DialogHeader>
+                        <DialogTitle>Enroll Student</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                          <Label htmlFor="course">Course</Label>
-                          <Input id="course" name="course" placeholder="BSCS" required />
+                          <Label htmlFor="studentId">Student ID</Label>
+                          <Input id="studentId" name="studentId" placeholder="2024-0001" required />
                         </div>
                         <div className="grid gap-2">
-                          <Label htmlFor="year">Year Level</Label>
-                          <Input id="year" name="year" placeholder="3rd Year" required />
+                          <Label htmlFor="name">Full Name</Label>
+                          <Input id="name" name="name" placeholder="Juan Dela Cruz" required />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="email">Email Address</Label>
+                          <Input id="email" name="email" type="email" placeholder="juan@pnc.edu.ph" required />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="course">Course</Label>
+                            <Input id="course" name="course" placeholder="BSCS" required />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="year">Year Level</Label>
+                            <Input id="year" name="year" placeholder="3rd Year" required />
+                          </div>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="status">Status</Label>
+                          <Select name="status" defaultValue="Active">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Active">Active</SelectItem>
+                              <SelectItem value="Graduated">Graduated</SelectItem>
+                              <SelectItem value="On Leave">On Leave</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="status">Status</Label>
-                        <Select name="status" defaultValue="Active">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Active">Active</SelectItem>
-                            <SelectItem value="Graduated">Graduated</SelectItem>
-                            <SelectItem value="On Leave">On Leave</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">Enroll Student</Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+                      <DialogFooter>
+                        <Button type="submit">Enroll Student</Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
 
-            <Card className="shadow-sm border-none ring-1 ring-border">
-              <CardHeader className="border-b pb-4">
+            <Card className="shadow-sm border-none ring-1 ring-border overflow-hidden">
+              <CardHeader className="border-b bg-muted/5 pb-4">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="relative max-w-sm w-full">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search students by name, ID..." className="pl-9" />
+                    <Input 
+                      placeholder="Search students by name, ID..." 
+                      className="pl-9 h-10" 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" className="gap-2">
                       <Filter className="h-4 w-4" />
-                      Filters
+                      Filter
                     </Button>
                     <Button variant="outline" size="sm">Export CSV</Button>
                   </div>
@@ -160,9 +196,9 @@ export default function StudentsPage() {
                 ) : (
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="bg-muted/30">
                         <TableHead className="w-[120px]">Student ID</TableHead>
-                        <TableHead>Student Name</TableHead>
+                        <TableHead>Name & Email</TableHead>
                         <TableHead>Course</TableHead>
                         <TableHead>Year Level</TableHead>
                         <TableHead>Status</TableHead>
@@ -170,39 +206,58 @@ export default function StudentsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {students?.map((student: any) => (
-                        <TableRow key={student.id} className="cursor-pointer hover:bg-muted/30">
-                          <TableCell className="font-medium">{student.id}</TableCell>
+                      {filteredStudents.map((student: any) => (
+                        <TableRow key={student.id} className="cursor-default hover:bg-muted/20 transition-colors">
+                          <TableCell className="font-mono text-xs font-semibold">{student.id}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <Avatar className="h-8 w-8">
+                              <Avatar className="h-9 w-9 ring-1 ring-border">
                                 <AvatarImage src={student.imageUrl} />
                                 <AvatarFallback>{student.name[0]}</AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">
-                                <span className="font-medium leading-none">{student.name}</span>
-                                <span className="text-xs text-muted-foreground">{student.email}</span>
+                                <span className="font-medium text-sm leading-none">{student.name}</span>
+                                <span className="text-[10px] text-muted-foreground mt-1">{student.email}</span>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{student.course}</TableCell>
-                          <TableCell>{student.year}</TableCell>
+                          <TableCell className="text-sm">{student.course}</TableCell>
+                          <TableCell className="text-sm">{student.year}</TableCell>
                           <TableCell>
-                            <Badge variant={student.status === "Active" ? "default" : student.status === "Graduated" ? "secondary" : "outline"} className={student.status === "Active" ? "bg-accent text-accent-foreground" : ""}>
+                            <Badge variant={student.status === "Active" ? "default" : student.status === "Graduated" ? "secondary" : "outline"} className={student.status === "Active" ? "bg-accent text-accent-foreground" : "text-[10px]"}>
                               {student.status}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem className="cursor-pointer">View Records</DropdownMenuItem>
+                                {isAdmin && (
+                                  <>
+                                    <DropdownMenuItem className="cursor-pointer">Edit Info</DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      className="text-destructive cursor-pointer"
+                                      onClick={() => handleDeleteStudent(student.id)}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Delete Record
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))}
-                      {(!students || students.length === 0) && (
+                      {filteredStudents.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={6} className="h-24 text-center text-muted-foreground italic">
-                            No students found in the database.
+                          <TableCell colSpan={6} className="h-32 text-center text-muted-foreground italic">
+                            No matching students found in the database.
                           </TableCell>
                         </TableRow>
                       )}
