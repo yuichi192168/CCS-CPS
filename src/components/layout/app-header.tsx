@@ -1,10 +1,9 @@
-
 "use client"
 
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2 } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
@@ -30,7 +29,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
@@ -102,6 +100,11 @@ export function AppHeader() {
     }
   }
 
+  const fillDemo = (demoEmail: string) => {
+    setEmail(demoEmail)
+    setPassword(demoEmail.split('@')[0] + "123")
+  }
+
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
       <div className="flex items-center gap-4 flex-1">
@@ -160,7 +163,7 @@ export function AppHeader() {
                     Sign In
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[400px]">
+                <DialogContent className="sm:max-w-[420px]">
                   <Tabs defaultValue="login" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="login">Login</TabsTrigger>
@@ -201,6 +204,26 @@ export function AppHeader() {
                           Sign In
                         </Button>
                       </form>
+
+                      <div className="mt-6 rounded-lg bg-muted/50 p-4 border border-border">
+                        <div className="flex items-center gap-2 mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          <Info className="h-3 w-3" /> Demo Credentials
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8" onClick={() => fillDemo('admin@ccs.edu.ph')}>
+                             Admin: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
+                           </Button>
+                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8" onClick={() => fillDemo('faculty@ccs.edu.ph')}>
+                             Faculty: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
+                           </Button>
+                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8" onClick={() => fillDemo('student@ccs.edu.ph')}>
+                             Student: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
+                           </Button>
+                        </div>
+                        <p className="mt-3 text-[10px] text-muted-foreground text-center italic">
+                          Password for all demo accounts is their prefix + "123" (e.g., admin123).
+                        </p>
+                      </div>
                     </TabsContent>
 
                     <TabsContent value="signup" className="space-y-4 pt-4">

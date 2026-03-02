@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -39,16 +38,25 @@ export function useUserProfile() {
         if (docSnap.exists()) {
           setProfile(docSnap.data() as UserProfile);
         } else {
-          // New user logic: default to 'student' for now
-          // In a real app, this might be handled by an invitation system
+          // Determine role based on default emails for the prototype
+          let role: UserRole = 'student';
+          const email = authUser.email?.toLowerCase() || '';
+          
+          if (email === 'admin@ccs.edu.ph') {
+            role = 'admin';
+          } else if (email === 'faculty@ccs.edu.ph') {
+            role = 'faculty';
+          }
+
           const newProfile: UserProfile = {
             uid: authUser.uid,
             email: authUser.email || '',
-            displayName: authUser.displayName || 'Anonymous',
-            role: 'student',
+            displayName: authUser.displayName || email.split('@')[0],
+            role: role,
             photoURL: authUser.photoURL || '',
             createdAt: serverTimestamp(),
           };
+          
           setDoc(userDocRef, newProfile);
           setProfile(newProfile);
         }
