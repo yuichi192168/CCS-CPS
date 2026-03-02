@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -28,37 +29,44 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useUserProfile } from "@/firebase/auth/use-user-profile"
 
 const navItems = [
   {
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
+    roles: ["admin", "faculty", "student"],
   },
   {
     title: "Students",
     url: "/students",
     icon: GraduationCap,
+    roles: ["admin"],
   },
   {
     title: "Faculty",
     url: "/faculty",
     icon: Users,
+    roles: ["admin"],
   },
   {
     title: "Research Repository",
     url: "/research",
     icon: Library,
+    roles: ["admin", "faculty", "student"],
   },
   {
     title: "Events & Schedules",
     url: "/events",
     icon: Calendar,
+    roles: ["admin", "faculty", "student"],
   },
   {
     title: "Instructional Tools",
     url: "/tools",
     icon: Wand2,
+    roles: ["admin", "faculty"],
     children: [
       { title: "Syllabus Generator", url: "/tools/syllabus" },
       { title: "Research Summarizer", url: "/tools/summarizer" },
@@ -68,6 +76,12 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { profile } = useUserProfile()
+
+  const filteredItems = React.useMemo(() => {
+    if (!profile) return navItems.filter(item => item.url === "/" || item.url === "/research" || item.url === "/events");
+    return navItems.filter(item => item.roles.includes(profile.role));
+  }, [profile]);
 
   return (
     <Sidebar collapsible="icon">
@@ -84,7 +98,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu className="px-2 pt-4">
-          {navItems.map((item) => (
+          {filteredItems.map((item) => (
             <SidebarMenuItem key={item.url}>
               {item.children ? (
                 <div className="flex flex-col gap-1">

@@ -8,28 +8,52 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Students collection: Public read, Authenticated write
+    // Helper to check user role from the users collection
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+
+    function isFaculty() {
+      return isAuthenticated() && getUserRole() == 'faculty';
+    }
+
+    function isStudent() {
+      return isAuthenticated() && getUserRole() == 'student';
+    }
+
+    // Users collection: Users can read their own, Admin can read/write all
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && request.resource.data.role == resource.data.role);
+    }
+
+    // Students collection: Public read, Admin write
     match /students/{studentId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
-    // Faculty collection: Public read, Authenticated write
+    // Faculty collection: Public read, Admin write
     match /faculty/{facultyId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
-    // Research collection: Public read, Authenticated write
+    // Research collection: Public read, Admin and Faculty write
     match /research/{paperId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin() || isFaculty();
     }
 
-    // Events collection: Public read, Authenticated write
+    // Events collection: Public read, Admin write
     match /events/{eventId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
     // Default deny

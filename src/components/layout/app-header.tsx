@@ -1,11 +1,13 @@
+
 "use client"
 
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { useUser, useAuth } from "@/firebase"
+import { useAuth } from "@/firebase"
+import { useUserProfile } from "@/firebase/auth/use-user-profile"
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth"
 import {
   DropdownMenu,
@@ -16,9 +18,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
+import { Badge } from "@/components/ui/badge"
 
 export function AppHeader() {
-  const { user, loading } = useUser()
+  const { user, profile, loading } = useUserProfile()
   const auth = useAuth()
   const { toast } = useToast()
 
@@ -53,12 +56,18 @@ export function AppHeader() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search students, faculty, or research..."
+            placeholder="Search resources..."
             className="w-full bg-muted/50 pl-9 focus:bg-background"
           />
         </div>
       </div>
       <div className="flex items-center gap-4">
+        {profile && (
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-semibold">
+            <ShieldCheck className="h-3 w-3" />
+            <span className="capitalize">{profile.role}</span>
+          </div>
+        )}
         <Button variant="ghost" size="icon" className="relative text-muted-foreground">
           <Bell className="h-5 w-5" />
           <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-accent"></span>

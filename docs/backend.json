@@ -1,18 +1,32 @@
 
 {
   "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "System user account with role-based access.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "faculty", "student"] },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
     "Student": {
       "title": "Student",
       "description": "Student academic profile information.",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "The unique student identification number." },
-        "name": { "type": "string", "description": "Full name of the student." },
-        "course": { "type": "string", "description": "Degree program enrolled in." },
-        "year": { "type": "string", "description": "Current year level." },
-        "status": { "type": "string", "enum": ["Active", "Graduated", "On Leave"], "description": "Enrollment status." },
-        "email": { "type": "string", "format": "email", "description": "University email address." },
-        "imageUrl": { "type": "string", "description": "URL to the student's profile image." }
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "course": { "type": "string" },
+        "year": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "Graduated", "On Leave"] },
+        "email": { "type": "string", "format": "email" },
+        "imageUrl": { "type": "string" }
       },
       "required": ["id", "name", "course", "year", "status", "email"]
     },
@@ -21,12 +35,12 @@
       "description": "Faculty member profile and specialization details.",
       "type": "object",
       "properties": {
-        "name": { "type": "string", "description": "Full name of the faculty member." },
-        "role": { "type": "string", "description": "Job title or academic rank." },
-        "specialization": { "type": "string", "description": "Primary area of expertise." },
-        "publications": { "type": "number", "description": "Number of research publications." },
-        "email": { "type": "string", "format": "email", "description": "Contact email address." },
-        "image": { "type": "string", "description": "URL to the faculty member's portrait." }
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "specialization": { "type": "string" },
+        "publications": { "type": "number" },
+        "email": { "type": "string", "format": "email" },
+        "image": { "type": "string" }
       },
       "required": ["name", "role", "specialization", "email"]
     },
@@ -35,12 +49,13 @@
       "description": "Metadata for a research publication.",
       "type": "object",
       "properties": {
-        "title": { "type": "string", "description": "Title of the research paper." },
-        "authors": { "type": "string", "description": "Comma-separated list of authors." },
-        "year": { "type": "string", "description": "Year of publication." },
-        "tags": { "type": "array", "items": { "type": "string" }, "description": "Keywords or categories." },
-        "citation": { "type": "number", "description": "Number of times this paper has been cited." },
-        "abstract": { "type": "string", "description": "Brief summary of the paper." }
+        "title": { "type": "string" },
+        "authors": { "type": "string" },
+        "year": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "citation": { "type": "number" },
+        "abstract": { "type": "string" },
+        "ownerId": { "type": "string", "description": "UID of the faculty who uploaded it." }
       },
       "required": ["title", "authors", "year"]
     },
@@ -49,11 +64,11 @@
       "description": "Academic or extra-curricular event details.",
       "type": "object",
       "properties": {
-        "title": { "type": "string", "description": "Title of the event." },
-        "date": { "type": "string", "format": "date", "description": "Date of the event." },
-        "time": { "type": "string", "description": "Time of the event." },
-        "location": { "type": "string", "description": "Venue or online link." },
-        "type": { "type": "string", "enum": ["Competition", "Academic", "Administrative", "Workshop"], "description": "Category of the event." }
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "location": { "type": "string" },
+        "type": { "type": "string", "enum": ["Competition", "Academic", "Administrative", "Workshop"] }
       },
       "required": ["title", "date", "time", "location", "type"]
     }
@@ -62,6 +77,10 @@
     "providers": ["google.com"]
   },
   "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "description": "System users and their roles."
+    },
     "/students/{studentId}": {
       "schema": { "$ref": "#/backend/entities/Student" },
       "description": "Collection of student profiles."
