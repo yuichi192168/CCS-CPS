@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-dashboard",
+      "description": "University campus technology building",
+      "imageUrl": "https://images.unsplash.com/photo-1633111148061-a976bbe6f193?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8dW5pdmVyc2l0eSUyMGJ1aWxkaW5nJTIwdGVjaG5vbG9neXxlbnwwfHx8fDE3NzI0MjQxODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "university building technology"
+    },
+    {
+      "id": "faculty-member-1",
+      "description": "Professional faculty portrait",
+      "imageUrl": "https://images.unsplash.com/photo-1615712278090-a935af124081?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9mZXNzb3IlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzI0MjQxODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professor portrait"
+    },
+    {
+      "id": "student-avatar-1",
+      "description": "Student avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdHVkZW50JTIwcG9ydHJhaXR8ZW58MHx8fHwxNzcyMzk5MjAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "student portrait"
+    }
+  ]
 }
