@@ -1,29 +1,66 @@
-
 "use client"
 
-import { useMemo } from "react";
-import { AppHeader } from "@/components/layout/app-header";
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import { SidebarInset } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Plus, MoreHorizontal, Loader2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCollection, useFirestore } from "@/firebase";
-import { collection, query, orderBy } from "firebase/firestore";
+import { useMemo, useState } from "react"
+import { AppHeader } from "@/components/layout/app-header"
+import { AppSidebar } from "@/components/layout/app-sidebar"
+import { SidebarInset } from "@/components/ui/sidebar"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Search, Filter, Plus, MoreHorizontal, Loader2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useCollection, useFirestore, useUser } from "@/firebase"
+import { collection, query, orderBy, addDoc } from "firebase/firestore"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 export default function StudentsPage() {
-  const db = useFirestore();
+  const db = useFirestore()
+  const { user } = useUser()
+  const { toast } = useToast()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   
   const studentsQuery = useMemo(() => {
-    if (!db) return null;
-    return query(collection(db, "students"), orderBy("name", "asc"));
-  }, [db]);
+    if (!db) return null
+    return query(collection(db, "students"), orderBy("name", "asc"))
+  }, [db])
 
-  const { data: students, loading, error } = useCollection(studentsQuery);
+  const { data: students, loading, error } = useCollection(studentsQuery)
+
+  const handleAddStudent = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const newStudent = {
+      id: formData.get("studentId") as string,
+      name: formData.get("name") as string,
+      course: formData.get("course") as string,
+      year: formData.get("year") as string,
+      status: formData.get("status") as string,
+      email: formData.get("email") as string,
+      imageUrl: `https://picsum.photos/seed/${formData.get("studentId")}/200`
+    }
+
+    const studentsRef = collection(db, "students")
+    addDoc(studentsRef, newStudent)
+      .then(() => {
+        setIsDialogOpen(false)
+        toast({ title: "Success", description: "Student enrolled successfully." })
+      })
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: studentsRef.path,
+          operation: "create",
+          requestResourceData: newStudent,
+        })
+        errorEmitter.emit("permission-error", permissionError)
+      })
+  }
 
   return (
     <>
@@ -37,10 +74,62 @@ export default function StudentsPage() {
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-primary">Student Profiling</h1>
                 <p className="text-muted-foreground">Manage and view comprehensive student academic records.</p>
               </div>
-              <Button className="w-full sm:w-auto gap-2">
-                <Plus className="h-4 w-4" />
-                Enroll New Student
-              </Button>
+
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto gap-2" disabled={!user}>
+                    <Plus className="h-4 w-4" />
+                    Enroll New Student
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <form onSubmit={handleAddStudent}>
+                    <DialogHeader>
+                      <DialogTitle>Enroll Student</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="studentId">Student ID</Label>
+                        <Input id="studentId" name="studentId" placeholder="2024-0001" required />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input id="name" name="name" placeholder="Juan Dela Cruz" required />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" name="email" type="email" placeholder="juan@pnc.edu.ph" required />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="course">Course</Label>
+                          <Input id="course" name="course" placeholder="BSCS" required />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="year">Year Level</Label>
+                          <Input id="year" name="year" placeholder="3rd Year" required />
+                        </div>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select name="status" defaultValue="Active">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Active">Active</SelectItem>
+                            <SelectItem value="Graduated">Graduated</SelectItem>
+                            <SelectItem value="On Leave">On Leave</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Enroll Student</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Card className="shadow-sm border-none ring-1 ring-border">
@@ -87,7 +176,7 @@ export default function StudentsPage() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <Avatar className="h-8 w-8">
-                                <AvatarImage src={student.imageUrl || `https://picsum.photos/seed/${student.id}/40`} />
+                                <AvatarImage src={student.imageUrl} />
                                 <AvatarFallback>{student.name[0]}</AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">
@@ -126,5 +215,5 @@ export default function StudentsPage() {
         </main>
       </SidebarInset>
     </>
-  );
+  )
 }

@@ -1,17 +1,58 @@
-import { AppHeader } from "@/components/layout/app-header";
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import { SidebarInset } from "@/components/ui/sidebar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, Users, Library, Calendar, TrendingUp, BookOpen } from "lucide-react";
+"use client"
 
-const stats = [
-  { label: "Total Students", value: "1,248", icon: GraduationCap, color: "text-blue-600", bg: "bg-blue-50" },
-  { label: "Faculty Members", value: "84", icon: Users, iconColor: "text-emerald-600", bg: "bg-emerald-50" },
-  { label: "Research Papers", value: "312", icon: Library, iconColor: "text-indigo-600", bg: "bg-indigo-50" },
-  { label: "Upcoming Events", value: "12", icon: Calendar, iconColor: "text-orange-600", bg: "bg-orange-50" },
-];
+import { useMemo } from "react"
+import { AppHeader } from "@/components/layout/app-header"
+import { AppSidebar } from "@/components/layout/app-sidebar"
+import { SidebarInset } from "@/components/ui/sidebar"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { GraduationCap, Users, Library, Calendar, TrendingUp, BookOpen, Loader2 } from "lucide-react"
+import { useCollection, useFirestore } from "@/firebase"
+import { collection } from "firebase/firestore"
 
 export default function Dashboard() {
+  const db = useFirestore()
+
+  const studentsRef = useMemo(() => collection(db, "students"), [db])
+  const facultyRef = useMemo(() => collection(db, "faculty"), [db])
+  const researchRef = useMemo(() => collection(db, "research"), [db])
+  const eventsRef = useMemo(() => collection(db, "events"), [db])
+
+  const { data: students, loading: loadingStudents } = useCollection(studentsRef)
+  const { data: faculty, loading: loadingFaculty } = useCollection(facultyRef)
+  const { data: research, loading: loadingResearch } = useCollection(researchRef)
+  const { data: events, loading: loadingEvents } = useCollection(eventsRef)
+
+  const stats = [
+    { 
+      label: "Total Students", 
+      value: loadingStudents ? "..." : (students?.length || 0).toString(), 
+      icon: GraduationCap, 
+      color: "text-blue-600", 
+      bg: "bg-blue-50" 
+    },
+    { 
+      label: "Faculty Members", 
+      value: loadingFaculty ? "..." : (faculty?.length || 0).toString(), 
+      icon: Users, 
+      iconColor: "text-emerald-600", 
+      bg: "bg-emerald-50" 
+    },
+    { 
+      label: "Research Papers", 
+      value: loadingResearch ? "..." : (research?.length || 0).toString(), 
+      icon: Library, 
+      iconColor: "text-indigo-600", 
+      bg: "bg-indigo-50" 
+    },
+    { 
+      label: "Upcoming Events", 
+      value: loadingEvents ? "..." : (events?.length || 0).toString(), 
+      icon: Calendar, 
+      iconColor: "text-orange-600", 
+      bg: "bg-orange-50" 
+    },
+  ]
+
   return (
     <>
       <AppSidebar />
@@ -88,5 +129,5 @@ export default function Dashboard() {
         </main>
       </SidebarInset>
     </>
-  );
+  )
 }
