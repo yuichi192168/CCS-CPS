@@ -1,23 +1,30 @@
+
+"use client"
+
+import { useMemo } from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Plus, MoreHorizontal, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const students = [
-  { id: "2021-00124", name: "Alice Henderson", course: "BS Computer Science", year: "3rd Year", status: "Active", email: "a.henderson@university.edu" },
-  { id: "2022-00451", name: "Benjamin Thorne", course: "BS Information Technology", year: "2nd Year", status: "Active", email: "b.thorne@university.edu" },
-  { id: "2020-00892", name: "Clara Oswald", course: "BS Computer Science", year: "4th Year", status: "Graduated", email: "c.oswald@university.edu" },
-  { id: "2023-00103", name: "David Tennant", course: "BS Computer Science", year: "1st Year", status: "Active", email: "d.tennant@university.edu" },
-  { id: "2021-00673", name: "Emma Watson", course: "BS Information Systems", year: "3rd Year", status: "On Leave", email: "e.watson@university.edu" },
-];
+import { useCollection, useFirestore } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
 
 export default function StudentsPage() {
+  const db = useFirestore();
+  
+  const studentsQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "students"), orderBy("name", "asc"));
+  }, [db]);
+
+  const { data: students, loading, error } = useCollection(studentsQuery);
+
   return (
     <>
       <AppSidebar />
@@ -53,49 +60,66 @@ export default function StudentsPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px]">Student ID</TableHead>
-                      <TableHead>Student Name</TableHead>
-                      <TableHead>Course</TableHead>
-                      <TableHead>Year Level</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {students.map((student) => (
-                      <TableRow key={student.id} className="cursor-pointer hover:bg-muted/30">
-                        <TableCell className="font-medium">{student.id}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={`https://picsum.photos/seed/${student.id}/40`} />
-                              <AvatarFallback>{student.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col">
-                              <span className="font-medium leading-none">{student.name}</span>
-                              <span className="text-xs text-muted-foreground">{student.email}</span>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{student.course}</TableCell>
-                        <TableCell>{student.year}</TableCell>
-                        <TableCell>
-                          <Badge variant={student.status === "Active" ? "default" : student.status === "Graduated" ? "secondary" : "outline"} className={student.status === "Active" ? "bg-accent text-accent-foreground" : ""}>
-                            {student.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
+                {loading ? (
+                  <div className="flex h-32 items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                ) : error ? (
+                  <div className="p-8 text-center text-destructive">
+                    Failed to load students. Please try again later.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[120px]">Student ID</TableHead>
+                        <TableHead>Student Name</TableHead>
+                        <TableHead>Course</TableHead>
+                        <TableHead>Year Level</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {students?.map((student: any) => (
+                        <TableRow key={student.id} className="cursor-pointer hover:bg-muted/30">
+                          <TableCell className="font-medium">{student.id}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={student.imageUrl || `https://picsum.photos/seed/${student.id}/40`} />
+                                <AvatarFallback>{student.name[0]}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col">
+                                <span className="font-medium leading-none">{student.name}</span>
+                                <span className="text-xs text-muted-foreground">{student.email}</span>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{student.course}</TableCell>
+                          <TableCell>{student.year}</TableCell>
+                          <TableCell>
+                            <Badge variant={student.status === "Active" ? "default" : student.status === "Graduated" ? "secondary" : "outline"} className={student.status === "Active" ? "bg-accent text-accent-foreground" : ""}>
+                              {student.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {(!students || students.length === 0) && (
+                        <TableRow>
+                          <TableCell colSpan={6} className="h-24 text-center text-muted-foreground italic">
+                            No students found in the database.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </div>

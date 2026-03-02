@@ -1,0 +1,82 @@
+
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Student academic profile information.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique student identification number." },
+        "name": { "type": "string", "description": "Full name of the student." },
+        "course": { "type": "string", "description": "Degree program enrolled in." },
+        "year": { "type": "string", "description": "Current year level." },
+        "status": { "type": "string", "enum": ["Active", "Graduated", "On Leave"], "description": "Enrollment status." },
+        "email": { "type": "string", "format": "email", "description": "University email address." },
+        "imageUrl": { "type": "string", "description": "URL to the student's profile image." }
+      },
+      "required": ["id", "name", "course", "year", "status", "email"]
+    },
+    "Faculty": {
+      "title": "Faculty",
+      "description": "Faculty member profile and specialization details.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the faculty member." },
+        "role": { "type": "string", "description": "Job title or academic rank." },
+        "specialization": { "type": "string", "description": "Primary area of expertise." },
+        "publications": { "type": "number", "description": "Number of research publications." },
+        "email": { "type": "string", "format": "email", "description": "Contact email address." },
+        "image": { "type": "string", "description": "URL to the faculty member's portrait." }
+      },
+      "required": ["name", "role", "specialization", "email"]
+    },
+    "ResearchPaper": {
+      "title": "Research Paper",
+      "description": "Metadata for a research publication.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the research paper." },
+        "authors": { "type": "string", "description": "Comma-separated list of authors." },
+        "year": { "type": "string", "description": "Year of publication." },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Keywords or categories." },
+        "citation": { "type": "number", "description": "Number of times this paper has been cited." },
+        "abstract": { "type": "string", "description": "Brief summary of the paper." }
+      },
+      "required": ["title", "authors", "year"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Academic or extra-curricular event details.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the event." },
+        "date": { "type": "string", "format": "date", "description": "Date of the event." },
+        "time": { "type": "string", "description": "Time of the event." },
+        "location": { "type": "string", "description": "Venue or online link." },
+        "type": { "type": "string", "enum": ["Competition", "Academic", "Administrative", "Workshop"], "description": "Category of the event." }
+      },
+      "required": ["title", "date", "time", "location", "type"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com"]
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/backend/entities/Student" },
+      "description": "Collection of student profiles."
+    },
+    "/faculty/{facultyId}": {
+      "schema": { "$ref": "#/backend/entities/Faculty" },
+      "description": "Collection of faculty profiles."
+    },
+    "/research/{paperId}": {
+      "schema": { "$ref": "#/backend/entities/ResearchPaper" },
+      "description": "Repository of research papers."
+    },
+    "/events/{eventId}": {
+      "schema": { "$ref": "#/backend/entities/Event" },
+      "description": "Academic calendar events."
+    }
+  }
+}
