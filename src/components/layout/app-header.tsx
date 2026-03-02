@@ -1,14 +1,20 @@
 
 "use client"
 
+import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn, ShieldCheck } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth"
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  updateProfile 
+} from "firebase/auth"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,26 +23,74 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function AppHeader() {
-  const { user, profile, loading } = useUserProfile()
+  const { user, profile, loading: profileLoading } = useUserProfile()
   const auth = useAuth()
   const { toast } = useToast()
+  
+  const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [authLoading, setAuthLoading] = useState(false)
+  
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [displayName, setDisplayName] = useState("")
 
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider()
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthLoading(true)
     try {
-      await signInWithPopup(auth, provider)
-      toast({ title: "Welcome!", description: "Successfully signed in." })
+      await signInWithEmailAndPassword(auth, email, password)
+      toast({ title: "Welcome back!", description: "Successfully signed in." })
+      setIsAuthOpen(false)
+      resetAuthFields()
     } catch (error: any) {
       toast({ 
         title: "Login Failed", 
         description: error.message, 
         variant: "destructive" 
       })
+    } finally {
+      setAuthLoading(false)
     }
+  }
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthLoading(true)
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      await updateProfile(userCredential.user, { displayName })
+      toast({ title: "Account Created", description: "Welcome to CCS Profiling System!" })
+      setIsAuthOpen(false)
+      resetAuthFields()
+    } catch (error: any) {
+      toast({ 
+        title: "Registration Failed", 
+        description: error.message, 
+        variant: "destructive" 
+      })
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const resetAuthFields = () => {
+    setEmail("")
+    setPassword("")
+    setDisplayName("")
   }
 
   const handleLogout = async () => {
@@ -73,21 +127,21 @@ export function AppHeader() {
           <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-accent"></span>
         </Button>
         <div className="flex items-center gap-3 border-l pl-4">
-          {!loading && (
+          {!profileLoading && (
             user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
                     <Avatar className="h-9 w-9 ring-2 ring-primary/10">
                       <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${user.uid}/100`} />
-                      <AvatarFallback>{user.displayName?.charAt(0) || "U"}</AvatarFallback>
+                      <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                      <p className="text-sm font-medium leading-none">{user.displayName || "User"}</p>
                       <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
@@ -99,10 +153,104 @@ export function AppHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button size="sm" onClick={handleLogin} className="gap-2">
-                <LogIn className="h-4 w-4" />
-                Sign In
-              </Button>
+              <Dialog open={isAuthOpen} onOpenChange={setIsAuthOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-2">
+                    <LogIn className="h-4 w-4" />
+                    Sign In
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[400px]">
+                  <Tabs defaultValue="login" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="login">Login</TabsTrigger>
+                      <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="login" className="space-y-4 pt-4">
+                      <DialogHeader>
+                        <DialogTitle>Sign In</DialogTitle>
+                        <DialogDescription>
+                          Enter your credentials to access your portal.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleLogin} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input 
+                            id="email" 
+                            type="email" 
+                            placeholder="m@example.com" 
+                            required 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="password">Password</Label>
+                          <Input 
+                            id="password" 
+                            type="password" 
+                            required 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                        </div>
+                        <Button type="submit" className="w-full" disabled={authLoading}>
+                          {authLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <LogIn className="h-4 w-4 mr-2" />}
+                          Sign In
+                        </Button>
+                      </form>
+                    </TabsContent>
+
+                    <TabsContent value="signup" className="space-y-4 pt-4">
+                      <DialogHeader>
+                        <DialogTitle>Create Account</DialogTitle>
+                        <DialogDescription>
+                          Register for the CCS Profiling System.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleSignUp} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="signup-name">Full Name</Label>
+                          <Input 
+                            id="signup-name" 
+                            placeholder="John Doe" 
+                            required 
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="signup-email">Email</Label>
+                          <Input 
+                            id="signup-email" 
+                            type="email" 
+                            placeholder="m@example.com" 
+                            required 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="signup-password">Password</Label>
+                          <Input 
+                            id="signup-password" 
+                            type="password" 
+                            required 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                        </div>
+                        <Button type="submit" className="w-full" disabled={authLoading}>
+                          {authLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <UserPlus className="h-4 w-4 mr-2" />}
+                          Create Account
+                        </Button>
+                      </form>
+                    </TabsContent>
+                  </Tabs>
+                </DialogContent>
+              </Dialog>
             )
           )}
         </div>
