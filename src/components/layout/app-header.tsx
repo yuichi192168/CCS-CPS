@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info, AlertTriangle } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info, AlertCircle } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
@@ -33,6 +33,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export function AppHeader() {
   const { user, profile, loading: profileLoading } = useUserProfile()
@@ -49,7 +50,9 @@ export function AppHeader() {
   const handleAuthError = (error: any) => {
     let message = error.message;
     if (error.code === 'auth/operation-not-allowed') {
-      message = "Email/Password sign-in is disabled. Please enable it in the Firebase Console (Authentication > Sign-in method).";
+      message = "Email/Password sign-in is disabled. Please enable it in the Firebase Console.";
+    } else if (error.code === 'auth/invalid-credential') {
+      message = "Invalid credentials. If this is a new demo account, please use the 'Sign Up' tab first to create it.";
     }
     toast({ 
       title: "Authentication Error", 
@@ -153,6 +156,13 @@ export function AppHeader() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <a href="/profile" className="flex w-full items-center">
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      <span>My Profile</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
@@ -167,7 +177,7 @@ export function AppHeader() {
                     Sign In
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[420px]">
+                <DialogContent className="sm:max-w-[440px]">
                   <Tabs defaultValue="login" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="login">Login</TabsTrigger>
@@ -178,9 +188,18 @@ export function AppHeader() {
                       <DialogHeader>
                         <DialogTitle>Sign In</DialogTitle>
                         <DialogDescription>
-                          Enter your credentials to access your portal.
+                          Access your academic portal.
                         </DialogDescription>
                       </DialogHeader>
+
+                      <Alert className="bg-primary/5 border-primary/20">
+                        <Info className="h-4 w-4 text-primary" />
+                        <AlertTitle className="text-sm font-semibold text-primary">Demo Notice</AlertTitle>
+                        <AlertDescription className="text-xs text-muted-foreground">
+                          If you haven't used a demo account yet, please **Sign Up** first to create it.
+                        </AlertDescription>
+                      </Alert>
+
                       <form onSubmit={handleLogin} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
@@ -210,23 +229,20 @@ export function AppHeader() {
                       </form>
 
                       <div className="mt-6 rounded-lg bg-muted/50 p-4 border border-border">
-                        <div className="flex items-center gap-2 mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          <Info className="h-3 w-3" /> Demo Credentials
+                        <div className="flex items-center gap-2 mb-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                          Quick Demo Setup
                         </div>
                         <div className="grid grid-cols-1 gap-2">
-                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8" onClick={() => fillDemo('admin@ccs.edu.ph')}>
+                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('admin@ccs.edu.ph')}>
                              Admin: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
                            </Button>
-                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8" onClick={() => fillDemo('faculty@ccs.edu.ph')}>
+                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('faculty@ccs.edu.ph')}>
                              Faculty: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
                            </Button>
-                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8" onClick={() => fillDemo('student@ccs.edu.ph')}>
+                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('student@ccs.edu.ph')}>
                              Student: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
                            </Button>
                         </div>
-                        <p className="mt-3 text-[10px] text-muted-foreground text-center italic">
-                          Password for all demo accounts is their prefix + "123" (e.g., admin123).
-                        </p>
                       </div>
                     </TabsContent>
 
@@ -234,7 +250,7 @@ export function AppHeader() {
                       <DialogHeader>
                         <DialogTitle>Create Account</DialogTitle>
                         <DialogDescription>
-                          Register for the CCS Profiling System.
+                          Register to initialize your role.
                         </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleSignUp} className="space-y-4">
@@ -253,7 +269,7 @@ export function AppHeader() {
                           <Input 
                             id="signup-email" 
                             type="email" 
-                            placeholder="m@example.com" 
+                            placeholder="m@ccs.edu.ph" 
                             required 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

@@ -37,6 +37,7 @@ export function useUserProfile() {
       const unsubscribeDoc = onSnapshot(userDocRef, (docSnap) => {
         if (docSnap.exists()) {
           setProfile(docSnap.data() as UserProfile);
+          setLoading(false);
         } else {
           // Determine role based on default emails for the prototype
           let role: UserRole = 'student';
@@ -57,10 +58,14 @@ export function useUserProfile() {
             createdAt: serverTimestamp(),
           };
           
-          setDoc(userDocRef, newProfile);
-          setProfile(newProfile);
+          setDoc(userDocRef, newProfile).then(() => {
+            setProfile(newProfile);
+            setLoading(false);
+          }).catch(err => {
+            console.error("Error creating profile:", err);
+            setLoading(false);
+          });
         }
-        setLoading(false);
       }, (error) => {
         console.error("Error fetching user profile:", error);
         setLoading(false);
