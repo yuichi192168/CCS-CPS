@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info, AlertTriangle } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
@@ -46,6 +46,18 @@ export function AppHeader() {
   const [password, setPassword] = useState("")
   const [displayName, setDisplayName] = useState("")
 
+  const handleAuthError = (error: any) => {
+    let message = error.message;
+    if (error.code === 'auth/operation-not-allowed') {
+      message = "Email/Password sign-in is disabled. Please enable it in the Firebase Console (Authentication > Sign-in method).";
+    }
+    toast({ 
+      title: "Authentication Error", 
+      description: message, 
+      variant: "destructive" 
+    });
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setAuthLoading(true)
@@ -55,11 +67,7 @@ export function AppHeader() {
       setIsAuthOpen(false)
       resetAuthFields()
     } catch (error: any) {
-      toast({ 
-        title: "Login Failed", 
-        description: error.message, 
-        variant: "destructive" 
-      })
+      handleAuthError(error)
     } finally {
       setAuthLoading(false)
     }
@@ -75,11 +83,7 @@ export function AppHeader() {
       setIsAuthOpen(false)
       resetAuthFields()
     } catch (error: any) {
-      toast({ 
-        title: "Registration Failed", 
-        description: error.message, 
-        variant: "destructive" 
-      })
+      handleAuthError(error)
     } finally {
       setAuthLoading(false)
     }
