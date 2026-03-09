@@ -114,7 +114,7 @@ export default function ProfilePage() {
                       </Label>
                       <Input 
                         id="email" 
-                        value={profile?.email} 
+                        value={profile?.email || ""} 
                         disabled 
                         className="bg-muted/50"
                       />
