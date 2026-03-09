@@ -8,7 +8,6 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -35,7 +34,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      toast({ title: "Welcome back!", description: "Successfully signed in to Pinnacle LMS." })
+      toast({ title: "Welcome back!", description: "Successfully signed in." })
       router.push("/")
     } catch (error: any) {
       let message = "Invalid email or password."
@@ -107,51 +106,47 @@ export default function LoginPage() {
       <div className="flex w-full flex-col items-center justify-center bg-background p-8 lg:w-1/2">
         <div className="w-full max-w-md space-y-8">
           <div className="flex flex-col items-center text-center">
-            <div className="flex items-center gap-3">
+            <div className="mb-8">
                <Image 
                 src="/images/logo.png" 
-                alt="Logo Small" 
-                width={48} 
-                height={48}
-                className="rounded-full"
+                alt="University Logo" 
+                width={120} 
+                height={120}
+                className="rounded-full shadow-lg"
               />
-              <div className="text-left leading-none">
-                <h2 className="text-xl font-bold text-primary">University of Cabuyao</h2>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest leading-none mt-1">(PAMANTASAN NG CABUYAO)</p>
-              </div>
             </div>
-            <div className="mt-10 mb-6">
-              <h1 className="text-6xl font-black italic tracking-tighter text-primary">Pinna<span className="text-accent">C</span>le</h1>
-              <p className="text-sm font-bold text-primary uppercase tracking-[0.2em] mt-1">Learning Management System</p>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-primary">University of Cabuyao</h2>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mt-1">PAMANTASAN NG CABUYAO</p>
             </div>
-            <Badge className="bg-[#e2f1e9] text-primary hover:bg-[#e2f1e9] font-bold text-sm py-1.5 px-8 rounded-md mb-8">
-              STUDENT / FACULTY LOGIN
+            <Badge className="bg-[#e2f1e9] text-primary hover:bg-[#e2f1e9] font-bold text-sm py-2 px-10 rounded-md mb-8">
+              STUDENT / FACULTY / ADMIN LOGIN
             </Badge>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-4">
               <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors">
                   <User className="h-5 w-5" />
                 </div>
                 <Input
                   type="email"
                   placeholder="Student ID / Email"
-                  className="h-14 pl-12 bg-blue-50/30 border-none shadow-sm focus-visible:ring-1 focus-visible:ring-primary/20"
+                  className="h-14 pl-12 bg-blue-50/30 border-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors">
                   <Lock className="h-5 w-5" />
                 </div>
                 <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="h-14 pl-12 pr-12 bg-blue-50/30 border-none shadow-sm focus-visible:ring-1 focus-visible:ring-primary/20"
+                  className="h-14 pl-12 pr-12 bg-blue-50/30 border-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -159,7 +154,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -174,10 +169,10 @@ export default function LoginPage() {
 
             <Button 
               type="submit" 
-              className="h-12 w-full rounded-full bg-primary text-lg font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+              className="h-14 w-full rounded-full bg-primary text-lg font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20"
               disabled={loading}
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "LOGIN"}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "LOGIN"}
             </Button>
           </form>
 
@@ -187,13 +182,13 @@ export default function LoginPage() {
             </div>
             <div className="grid grid-cols-1 gap-2">
                <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-9 hover:bg-primary/5 hover:text-primary border-primary/10" onClick={() => fillDemo('admin@ccs.edu.ph')}>
-                 Admin: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
+                 Admin Access: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
                </Button>
                <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-9 hover:bg-primary/5 hover:text-primary border-primary/10" onClick={() => fillDemo('faculty@ccs.edu.ph')}>
-                 Faculty: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
+                 Faculty Access: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
                </Button>
                <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-9 hover:bg-primary/5 hover:text-primary border-primary/10" onClick={() => fillDemo('student@ccs.edu.ph')}>
-                 Student: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
+                 Student Access: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
                </Button>
             </div>
           </div>
