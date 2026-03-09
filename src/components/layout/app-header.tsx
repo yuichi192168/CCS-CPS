@@ -130,6 +130,9 @@ export function AppHeader() {
     setPassword(demoEmail.split('@')[0] + "123")
   }
 
+  // Determine professional suit profile image based on role
+  const profileImage = `/images/suit-${profile?.role || 'student'}.png`
+
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
       <div className="flex items-center gap-4 flex-1">
@@ -196,7 +199,8 @@ export function AppHeader() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
                     <Avatar className="h-9 w-9 ring-2 ring-primary/10">
-                      <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${user.uid}/100`} />
+                      <AvatarImage src={profileImage} alt="Profile" />
+                      <AvatarImage src={PNC_LOGO} alt="Fallback" />
                       <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
                   </Button>

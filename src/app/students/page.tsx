@@ -12,9 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Filter, Plus, MoreHorizontal, Loader2, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useCollection, useFirestore, useUser } from "@/firebase"
+import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
-import { collection, query, orderBy, addDoc, deleteDoc, doc } from "firebase/firestore"
+import { collection, query, orderBy, setDoc, deleteDoc, doc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,6 +22,8 @@ import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+
+const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 export default function StudentsPage() {
   const db = useFirestore()
@@ -50,25 +52,28 @@ export default function StudentsPage() {
   const handleAddStudent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
+    const studentId = formData.get("studentId") as string
+    
     const newStudent = {
-      id: formData.get("studentId") as string,
+      id: studentId,
       name: formData.get("name") as string,
       course: formData.get("course") as string,
       year: formData.get("year") as string,
       status: formData.get("status") as string,
       email: formData.get("email") as string,
-      imageUrl: `https://picsum.photos/seed/${formData.get("studentId")}/200`
+      imageUrl: "/images/suit-student.png"
     }
 
-    const studentsRef = collection(db, "students")
-    addDoc(studentsRef, newStudent)
+    // Using setDoc with the studentId as the document reference to avoid random UIDs
+    const studentRef = doc(db, "students", studentId)
+    setDoc(studentRef, newStudent)
       .then(() => {
         setIsDialogOpen(false)
         toast({ title: "Success", description: "Student enrolled successfully." })
       })
       .catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
-          path: studentsRef.path,
+          path: studentRef.path,
           operation: "create",
           requestResourceData: newStudent,
         })
@@ -212,7 +217,8 @@ export default function StudentsPage() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <Avatar className="h-9 w-9 ring-1 ring-border">
-                                <AvatarImage src={student.imageUrl} />
+                                <AvatarImage src={student.imageUrl} alt={student.name} />
+                                <AvatarImage src={PNC_LOGO} alt="Fallback" />
                                 <AvatarFallback>{student.name[0]}</AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">
