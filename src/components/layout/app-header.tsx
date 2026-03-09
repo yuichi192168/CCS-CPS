@@ -32,6 +32,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -50,6 +58,12 @@ export function AppHeader() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [displayName, setDisplayName] = useState("")
+
+  const [notifications] = useState([
+    { id: 1, title: "System Maintenance", description: "Scheduled maintenance on Sunday at 2:00 AM.", time: "2h ago", type: "info" },
+    { id: 2, title: "New Research Paper", description: "A new study on AI in Agriculture has been published.", time: "5h ago", type: "success" },
+    { id: 3, title: "Midterm Schedule", description: "The midterm examination schedule is now available.", time: "1d ago", type: "warning" },
+  ])
 
   const handleAuthError = (error: any) => {
     let message = error.message;
@@ -136,10 +150,45 @@ export function AppHeader() {
             <span className="capitalize">{profile.role}</span>
           </div>
         )}
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-accent"></span>
-        </Button>
+        
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative text-muted-foreground">
+              <Bell className="h-5 w-5" />
+              {notifications.length > 0 && (
+                <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-accent"></span>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Notifications</SheetTitle>
+              <SheetDescription>Stay updated with the latest college activities and system alerts.</SheetDescription>
+            </SheetHeader>
+            <div className="mt-6 space-y-4">
+              {notifications.map((n) => (
+                <div key={n.id} className="flex gap-4 p-4 rounded-xl border bg-muted/5 hover:bg-muted/10 transition-all group">
+                  <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${
+                    n.type === 'success' ? 'bg-accent' : 
+                    n.type === 'warning' ? 'bg-orange-500' : 'bg-primary'
+                  }`} />
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold leading-none text-foreground">{n.title}</p>
+                    <p className="text-xs text-muted-foreground leading-snug">{n.description}</p>
+                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-tighter mt-2">{n.time}</p>
+                  </div>
+                </div>
+              ))}
+              {notifications.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
+                  <Bell className="h-12 w-12 mb-4" />
+                  <p className="text-sm italic">No new notifications.</p>
+                </div>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+
         <div className="flex items-center gap-3 border-l pl-4">
           {!profileLoading && (
             user ? (
