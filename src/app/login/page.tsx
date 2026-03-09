@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -68,9 +69,22 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side: CCS Solid Background #F36A22 */}
-      <div className="relative hidden w-1/2 lg:block bg-primary">
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-12 text-white">
+      {/* Left side: CCS Orange Hero with Logo Background */}
+      <div className="relative hidden w-1/2 lg:block bg-primary overflow-hidden">
+        {/* Logo Watermark Background */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-10">
+          <Image 
+            src={CCS_LOGO} 
+            alt="CCS Logo Background" 
+            width={800} 
+            height={800}
+            className="object-contain scale-150 rotate-12"
+            priority
+            unoptimized
+          />
+        </div>
+        
+        <div className="relative z-10 flex h-full flex-col items-center justify-center p-12 text-white">
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/95 p-4 shadow-2xl">
                 <Image 
@@ -102,22 +116,22 @@ export default function LoginPage() {
       <div className="flex w-full flex-col items-center justify-center bg-background p-8 lg:w-1/2">
         <div className="w-full max-w-md space-y-8">
           <div className="flex flex-col items-center text-center">
-            <div className="mb-8">
+            <div className="mb-8 block lg:hidden">
                <Image 
                 src={CCS_LOGO} 
                 alt="CCS Logo" 
-                width={120} 
-                height={120}
+                width={100} 
+                height={100}
                 className="rounded-full shadow-lg"
                 unoptimized
               />
             </div>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-primary">CCS Comprehensive Profiling</h2>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mt-1">UNIVERSITY OF CABUYAO</p>
+              <h2 className="text-2xl font-bold text-primary">CCS-CPS Access</h2>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mt-1">College of Computer Studies</p>
             </div>
             <Badge className="bg-primary/10 text-primary hover:bg-primary/20 font-bold text-sm py-2 px-10 rounded-md mb-8">
-              STUDENT / FACULTY / ADMIN LOGIN
+              USER LOGIN
             </Badge>
           </div>
 
@@ -156,12 +170,6 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center justify-end">
-              <button type="button" className="text-sm font-bold text-primary hover:underline">
-                Forgot Password?
-              </button>
             </div>
 
             <Button 
