@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -12,6 +11,9 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+
+const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const PNC_BG = "https://i.imgur.com/tQ1GCYN.png"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -74,7 +76,7 @@ export default function LoginPage() {
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/95 p-4 shadow-2xl">
                 <Image 
-                  src="/images/logo.png" 
+                  src={PNC_LOGO} 
                   alt="University of Cabuyao Logo" 
                   width={140} 
                   height={140}
@@ -96,7 +98,7 @@ export default function LoginPage() {
           </div>
         </div>
         <Image
-          src="/images/pnc_bg.png"
+          src={PNC_BG}
           alt="Pamantasan ng Cabuyao Campus"
           fill
           className="object-cover"
@@ -111,7 +113,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center text-center">
             <div className="mb-8">
                <Image 
-                src="/images/logo.png" 
+                src={PNC_LOGO} 
                 alt="PNC Logo" 
                 width={120} 
                 height={120}

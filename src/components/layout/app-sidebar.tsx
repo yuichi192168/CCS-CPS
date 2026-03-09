@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -32,6 +31,8 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
+
+const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 const navItems = [
   {
@@ -98,7 +99,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-3">
           <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-background p-1.5 shadow-sm ring-1 ring-border overflow-hidden">
              <Image 
-              src="/images/logo.png" 
+              src={PNC_LOGO} 
               alt="University Logo" 
               width={28} 
               height={28}

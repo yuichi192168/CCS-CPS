@@ -4,17 +4,19 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
+const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+
 export const metadata: Metadata = {
   title: 'CCS Comprehensive Profiling System - University of Cabuyao',
   description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies, Pamantasan ng Cabuyao.',
   icons: {
     icon: [
-      { url: '/images/logo.png', type: 'image/png' },
-      { url: '/images/logo.png', sizes: '32x32', type: 'image/png' },
-      { url: '/images/logo.png', sizes: '16x16', type: 'image/png' },
+      { url: PNC_LOGO, type: 'image/png' },
+      { url: PNC_LOGO, sizes: '32x32', type: 'image/png' },
+      { url: PNC_LOGO, sizes: '16x16', type: 'image/png' },
     ],
-    shortcut: '/images/logo.png',
-    apple: '/images/logo.png',
+    shortcut: PNC_LOGO,
+    apple: PNC_LOGO,
   },
 };
 

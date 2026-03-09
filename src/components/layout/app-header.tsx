@@ -4,7 +4,7 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info, AlertCircle } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
@@ -36,6 +36,8 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 export function AppHeader() {
   const { user, profile, loading: profileLoading } = useUserProfile()
@@ -188,7 +190,7 @@ export function AppHeader() {
                     
                     <TabsContent value="login" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
-                        <Image src="/images/logo.png" alt="PNC Logo" width={60} height={60} className="mb-2" />
+                        <Image src={PNC_LOGO} alt="PNC Logo" width={60} height={60} className="mb-2" />
                         <DialogTitle>University of Cabuyao</DialogTitle>
                         <DialogDescription>
                           Pamantasan ng Cabuyao Academic Portal
@@ -251,7 +253,7 @@ export function AppHeader() {
 
                     <TabsContent value="signup" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
-                        <Image src="/images/logo.png" alt="PNC Logo" width={60} height={60} className="mb-2" />
+                        <Image src={PNC_LOGO} alt="PNC Logo" width={60} height={60} className="mb-2" />
                         <DialogTitle>Create Account</DialogTitle>
                         <DialogDescription>
                           Register for the PNC CCS Profiling System.
