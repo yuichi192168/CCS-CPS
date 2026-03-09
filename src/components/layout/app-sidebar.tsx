@@ -32,6 +32,7 @@ import { usePathname } from "next/navigation"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 
 const CCS_LOGO = "/images/ccs_logo.png"
+const FALLBACK_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 const navItems = [
   {
@@ -105,7 +106,7 @@ export function AppSidebar() {
               className="object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "https://i.imgur.com/5aAzmh5.png";
+                target.src = FALLBACK_LOGO;
               }}
             />
           </div>

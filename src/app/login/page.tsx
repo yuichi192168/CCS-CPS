@@ -13,7 +13,7 @@ import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 const CCS_LOGO = "/images/ccs_logo.png"
-const FALLBACK_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const FALLBACK_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function LoginPage() {
   const router = useRouter()

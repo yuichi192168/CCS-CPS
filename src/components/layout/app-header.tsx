@@ -45,6 +45,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const CCS_LOGO = "/images/ccs_logo.png"
+const FALLBACK_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export function AppHeader() {
   const router = useRouter()
@@ -209,7 +210,17 @@ export function AppHeader() {
                     
                     <TabsContent value="login" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
-                        <Image src={CCS_LOGO} alt="CCS Logo" width={60} height={60} className="mb-2" />
+                        <Image 
+                          src={CCS_LOGO} 
+                          alt="CCS Logo" 
+                          width={60} 
+                          height={60} 
+                          className="mb-2" 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = FALLBACK_LOGO;
+                          }}
+                        />
                         <DialogTitle>CCS-CPS Portal</DialogTitle>
                         <DialogDescription>
                           College of Computer Studies Portal
@@ -234,7 +245,17 @@ export function AppHeader() {
 
                     <TabsContent value="signup" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
-                        <Image src={CCS_LOGO} alt="CCS Logo" width={60} height={60} className="mb-2" />
+                        <Image 
+                          src={CCS_LOGO} 
+                          alt="CCS Logo" 
+                          width={60} 
+                          height={60} 
+                          className="mb-2"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = FALLBACK_LOGO;
+                          }}
+                        />
                         <DialogTitle>Create Account</DialogTitle>
                         <DialogDescription>
                           Register for the CCS Profiling System.
