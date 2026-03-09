@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   title: 'CCS Comprehensive Profiling System - University of Cabuyao',
   description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies, Pamantasan ng Cabuyao.',
   icons: {
-    icon: '/images/logo.png',
+    icon: [
+      { url: '/images/logo.png', type: 'image/png' },
+      { url: '/images/logo.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/logo.png', sizes: '16x16', type: 'image/png' },
+    ],
     shortcut: '/images/logo.png',
     apple: '/images/logo.png',
   },
