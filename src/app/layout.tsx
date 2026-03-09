@@ -5,8 +5,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'CCS Comprehensive Profiling System',
-  description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies.',
+  title: 'CCS Comprehensive Profiling System - University of Cabuyao',
+  description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies, Pamantasan ng Cabuyao.',
   icons: {
     icon: '/images/logo.png',
     shortcut: '/images/logo.png',

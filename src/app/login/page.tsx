@@ -66,18 +66,19 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side: University branding background */}
+      {/* Left side: PNC Campus Background and Logo */}
       <div className="relative hidden w-1/2 lg:block">
         <div className="absolute inset-0 z-10 bg-primary/40 mix-blend-multiply" />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-12 text-white">
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
-             <div className="flex h-full w-full items-center justify-center rounded-full bg-white/90 p-4">
+             <div className="flex h-full w-full items-center justify-center rounded-full bg-white/95 p-4 shadow-2xl">
                 <Image 
                   src="/images/logo.png" 
-                  alt="University Logo" 
+                  alt="University of Cabuyao Logo" 
                   width={140} 
                   height={140}
                   className="object-contain"
+                  priority
                 />
              </div>
           </div>
@@ -90,12 +91,12 @@ export default function LoginPage() {
           <div className="mt-12 flex items-center gap-4 rounded-full bg-black/30 px-6 py-2 backdrop-blur-md">
             <Badge variant="outline" className="border-white/40 text-white">EST. 2003</Badge>
             <span className="h-4 w-px bg-white/20" />
-            <span className="text-sm font-medium">PEACE • EXCELLENCE • SERVICE</span>
+            <span className="text-sm font-medium tracking-wide">PEACE • EXCELLENCE • SERVICE</span>
           </div>
         </div>
         <Image
           src="/images/pnc_bg.png"
-          alt="University Campus"
+          alt="Pamantasan ng Cabuyao Campus"
           fill
           className="object-cover"
           priority
@@ -109,7 +110,7 @@ export default function LoginPage() {
             <div className="mb-8">
                <Image 
                 src="/images/logo.png" 
-                alt="University Logo" 
+                alt="PNC Logo" 
                 width={120} 
                 height={120}
                 className="rounded-full shadow-lg"
@@ -182,13 +183,13 @@ export default function LoginPage() {
             </div>
             <div className="grid grid-cols-1 gap-2">
                <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-9 hover:bg-primary/5 hover:text-primary border-primary/10" onClick={() => fillDemo('admin@ccs.edu.ph')}>
-                 Admin Access: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
+                 Admin: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
                </Button>
                <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-9 hover:bg-primary/5 hover:text-primary border-primary/10" onClick={() => fillDemo('faculty@ccs.edu.ph')}>
-                 Faculty Access: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
+                 Faculty: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
                </Button>
                <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-9 hover:bg-primary/5 hover:text-primary border-primary/10" onClick={() => fillDemo('student@ccs.edu.ph')}>
-                 Student Access: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
+                 Student: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
                </Button>
             </div>
           </div>

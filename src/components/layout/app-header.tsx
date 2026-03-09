@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
+import Image from "next/image"
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -185,10 +186,11 @@ export function AppHeader() {
                     </TabsList>
                     
                     <TabsContent value="login" className="space-y-4 pt-4">
-                      <DialogHeader>
-                        <DialogTitle>Sign In</DialogTitle>
+                      <DialogHeader className="flex flex-col items-center">
+                        <Image src="/images/logo.png" alt="PNC Logo" width={60} height={60} className="mb-2" />
+                        <DialogTitle>University of Cabuyao</DialogTitle>
                         <DialogDescription>
-                          Access your academic portal.
+                          Pamantasan ng Cabuyao Academic Portal
                         </DialogDescription>
                       </DialogHeader>
 
@@ -206,7 +208,7 @@ export function AppHeader() {
                           <Input 
                             id="email" 
                             type="email" 
-                            placeholder="m@example.com" 
+                            placeholder="m@ccs.edu.ph" 
                             required 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -230,7 +232,7 @@ export function AppHeader() {
 
                       <div className="mt-6 rounded-lg bg-muted/50 p-4 border border-border">
                         <div className="flex items-center gap-2 mb-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                          Quick Demo Setup
+                          Quick Demo Access
                         </div>
                         <div className="grid grid-cols-1 gap-2">
                            <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('admin@ccs.edu.ph')}>
@@ -247,10 +249,11 @@ export function AppHeader() {
                     </TabsContent>
 
                     <TabsContent value="signup" className="space-y-4 pt-4">
-                      <DialogHeader>
+                      <DialogHeader className="flex flex-col items-center">
+                        <Image src="/images/logo.png" alt="PNC Logo" width={60} height={60} className="mb-2" />
                         <DialogTitle>Create Account</DialogTitle>
                         <DialogDescription>
-                          Register to initialize your role.
+                          Register for the PNC CCS Profiling System.
                         </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleSignUp} className="space-y-4">
@@ -258,7 +261,7 @@ export function AppHeader() {
                           <Label htmlFor="signup-name">Full Name</Label>
                           <Input 
                             id="signup-name" 
-                            placeholder="John Doe" 
+                            placeholder="Juan Dela Cruz" 
                             required 
                             value={displayName}
                             onChange={(e) => setDisplayName(e.target.value)}
