@@ -12,8 +12,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-const CCS_LOGO = "https://i.imgur.com/5aAzmh5.png"
-const CCS_BG = "https://i.imgur.com/c2ywZT7.png"
+const CCS_LOGO = "/images/ccs_logo.png"
+const FALLBACK_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -69,9 +69,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side: CCS Campus Background with #F36A22 */}
+      {/* Left side: CCS Solid Background #F36A22 */}
       <div className="relative hidden w-1/2 lg:block bg-primary">
-        <div className="absolute inset-0 z-10 bg-black/10 mix-blend-multiply" />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-12 text-white">
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/95 p-4 shadow-2xl">
@@ -82,6 +81,10 @@ export default function LoginPage() {
                   height={140}
                   className="object-contain"
                   priority
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = FALLBACK_LOGO;
+                  }}
                 />
              </div>
           </div>
@@ -97,14 +100,6 @@ export default function LoginPage() {
             <span className="text-sm font-medium tracking-wide">COMPREHENSIVE PROFILING SYSTEM</span>
           </div>
         </div>
-        <Image
-          src={CCS_BG}
-          alt="CCS Background"
-          fill
-          className="object-cover opacity-40 mix-blend-overlay"
-          priority
-          unoptimized
-        />
       </div>
 
       {/* Right side: Login form */}
@@ -118,6 +113,10 @@ export default function LoginPage() {
                 width={120} 
                 height={120}
                 className="rounded-full shadow-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = FALLBACK_LOGO;
+                }}
               />
             </div>
             <div className="mb-8">

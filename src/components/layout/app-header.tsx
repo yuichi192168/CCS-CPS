@@ -44,7 +44,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const CCS_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const CCS_LOGO = "/images/ccs_logo.png"
 
 export function AppHeader() {
   const router = useRouter()

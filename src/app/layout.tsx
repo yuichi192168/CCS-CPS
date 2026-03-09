@@ -4,10 +4,10 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
-const CCS_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const CCS_LOGO = "/images/ccs_logo.png"
 
 export const metadata: Metadata = {
-  title: 'CCS Comprehensive Profiling System - PNC',
+  title: 'CCS Comprehensive Profiling System',
   description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies, Pamantasan ng Cabuyao.',
   icons: {
     icon: [
