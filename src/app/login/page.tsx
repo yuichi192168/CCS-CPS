@@ -77,10 +77,10 @@ export default function LoginPage() {
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/90 p-4">
                 <Image 
-                  src="https://picsum.photos/seed/pnc-logo/200" 
+                  src="/images/logo.png" 
                   alt="University Logo" 
-                  width={120} 
-                  height={120}
+                  width={140} 
+                  height={140}
                   className="object-contain"
                 />
              </div>
@@ -115,7 +115,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center gap-3">
                <Image 
-                src="https://picsum.photos/seed/pnc-mini/100" 
+                src="/images/logo.png" 
                 alt="Logo Small" 
                 width={48} 
                 height={48}

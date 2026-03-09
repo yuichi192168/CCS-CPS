@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -14,6 +13,7 @@ import {
   Wand2,
   UserCircle,
 } from "lucide-react"
+import Image from "next/image"
 
 import {
   Sidebar,
@@ -93,13 +93,19 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b px-4 py-4">
+      <SidebarHeader className="border-b px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <GraduationCap className="size-5" />
+          <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-background p-1.5 shadow-sm ring-1 ring-border">
+             <Image 
+              src="/images/logo.png" 
+              alt="Logo" 
+              width={28} 
+              height={28}
+              className="object-contain"
+            />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="font-headline font-bold text-lg tracking-tight">CCS Profiling</span>
+            <span className="font-headline font-bold text-lg tracking-tight text-primary">CCS Profiling</span>
             <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider leading-none">Comprehensive System</span>
           </div>
         </div>
