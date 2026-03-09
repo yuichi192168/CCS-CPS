@@ -1,7 +1,7 @@
-
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info } from "lucide-react"
@@ -48,6 +48,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 export function AppHeader() {
+  const router = useRouter()
   const { user, profile, loading: profileLoading } = useUserProfile()
   const auth = useAuth()
   const { toast } = useToast()
@@ -87,6 +88,7 @@ export function AppHeader() {
       toast({ title: "Welcome back!", description: "Successfully signed in." })
       setIsAuthOpen(false)
       resetAuthFields()
+      router.push("/")
     } catch (error: any) {
       handleAuthError(error)
     } finally {
@@ -103,6 +105,7 @@ export function AppHeader() {
       toast({ title: "Account Created", description: "Welcome to CCS Profiling System!" })
       setIsAuthOpen(false)
       resetAuthFields()
+      router.push("/")
     } catch (error: any) {
       handleAuthError(error)
     } finally {
@@ -120,6 +123,7 @@ export function AppHeader() {
     try {
       await signOut(auth)
       toast({ title: "Signed Out", description: "You have been signed out." })
+      router.push("/login")
     } catch (error: any) {
       toast({ title: "Error", description: "Failed to sign out.", variant: "destructive" })
     }
