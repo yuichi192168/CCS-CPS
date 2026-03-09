@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
-import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { Badge } from "@/components/ui/badge"
 
 export default function LoginPage() {
@@ -24,8 +23,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-
-  const loginImage = PlaceHolderImages.find(img => img.id === 'login-bg')
 
   useEffect(() => {
     if (user && !profileLoading) {
@@ -70,9 +67,9 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side: Green-themed branding background */}
+      {/* Left side: University branding background */}
       <div className="relative hidden w-1/2 lg:block">
-        <div className="absolute inset-0 z-10 bg-primary/60 mix-blend-multiply" />
+        <div className="absolute inset-0 z-10 bg-primary/40 mix-blend-multiply" />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-12 text-white">
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/90 p-4">
@@ -85,28 +82,25 @@ export default function LoginPage() {
                 />
              </div>
           </div>
-          <h1 className="text-center font-headline text-5xl font-bold tracking-tight">
+          <h1 className="text-center font-headline text-5xl font-bold tracking-tight text-white drop-shadow-lg">
             University of Cabuyao
           </h1>
-          <p className="mt-4 text-center text-xl font-medium text-white/80">
+          <p className="mt-4 text-center text-xl font-medium text-white/90 drop-shadow-md">
             Pamantasan ng Cabuyao
           </p>
-          <div className="mt-12 flex items-center gap-4 rounded-full bg-black/20 px-6 py-2 backdrop-blur-md">
+          <div className="mt-12 flex items-center gap-4 rounded-full bg-black/30 px-6 py-2 backdrop-blur-md">
             <Badge variant="outline" className="border-white/40 text-white">EST. 2003</Badge>
             <span className="h-4 w-px bg-white/20" />
             <span className="text-sm font-medium">PEACE • EXCELLENCE • SERVICE</span>
           </div>
         </div>
-        {loginImage && (
-          <Image
-            src={loginImage.imageUrl}
-            alt={loginImage.description}
-            fill
-            className="object-cover"
-            priority
-            data-ai-hint={loginImage.imageHint}
-          />
-        )}
+        <Image
+          src="/images/pnc_bg.png"
+          alt="University Campus"
+          fill
+          className="object-cover"
+          priority
+        />
       </div>
 
       {/* Right side: Login form */}
@@ -123,7 +117,7 @@ export default function LoginPage() {
               />
               <div className="text-left leading-none">
                 <h2 className="text-xl font-bold text-primary">University of Cabuyao</h2>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">(PAMANTASAN NG CABUYAO)</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest leading-none mt-1">(PAMANTASAN NG CABUYAO)</p>
               </div>
             </div>
             <div className="mt-10 mb-6">
