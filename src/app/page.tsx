@@ -1,12 +1,12 @@
-
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { AppHeader } from "@/components/layout/app-header"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { GraduationCap, Users, Library, Calendar, TrendingUp, BookOpen, UserCircle, History, Award, CheckCircle2, AlertCircle } from "lucide-react"
+import { GraduationCap, Users, Library, Calendar, TrendingUp, BookOpen, UserCircle, History, Award, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 import { collection } from "firebase/firestore"
@@ -15,8 +15,15 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export default function Dashboard() {
+  const router = useRouter()
   const db = useFirestore()
-  const { profile, loading: profileLoading } = useUserProfile()
+  const { profile, user, loading: profileLoading } = useUserProfile()
+
+  useEffect(() => {
+    if (!profileLoading && !user) {
+      router.push("/login")
+    }
+  }, [user, profileLoading, router])
 
   const studentsRef = useMemo(() => collection(db, "students"), [db])
   const facultyRef = useMemo(() => collection(db, "faculty"), [db])
@@ -64,6 +71,8 @@ export default function Dashboard() {
     )
   }
 
+  if (!user) return null
+
   return (
     <>
       <AppSidebar />
@@ -78,7 +87,7 @@ export default function Dashboard() {
                  profile?.role === 'student' ? "Student Dashboard" : "College Portal"}
               </h1>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="text-sm">Welcome, <strong>{profile?.displayName || "Guest"}</strong>.</span>
+                <span className="text-sm">Welcome, <strong>{profile?.displayName || "User"}</strong>.</span>
                 {profile && (
                   <div className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 bg-primary/10 text-primary rounded-full">
                     <CheckCircle2 className="h-3 w-3" />
@@ -126,10 +135,11 @@ export default function Dashboard() {
                           <div className="p-3 rounded-lg bg-background border shadow-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                             <action.icon className="h-5 w-5" />
                           </div>
-                          <div>
+                          <div className="flex-1">
                             <h4 className="font-semibold text-sm group-hover:text-primary transition-colors">{action.title}</h4>
                             <p className="text-xs text-muted-foreground line-clamp-1">{action.desc}</p>
                           </div>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                         </div>
                       </Link>
                     ))}
@@ -164,17 +174,17 @@ export default function Dashboard() {
             </div>
 
             {/* Profile Status Alert for new users */}
-            {!profileLoading && profile && (
-              <Card className="border-none shadow-sm ring-1 ring-border bg-amber-50/50">
+            {profile && (
+              <Card className="border-none shadow-sm ring-1 ring-border bg-primary/5">
                 <CardContent className="p-4 flex flex-col sm:flex-row items-center gap-4">
-                  <div className="p-2 rounded-full bg-amber-100 text-amber-600">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary">
                     <AlertCircle className="h-5 w-5" />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <h4 className="text-sm font-semibold text-amber-900">Complete Your Academic Profile</h4>
-                    <p className="text-xs text-amber-700">Ensure your student/faculty records are up to date for accurate profiling.</p>
+                    <h4 className="text-sm font-semibold text-primary">Complete Your Academic Profile</h4>
+                    <p className="text-xs text-muted-foreground">Ensure your student/faculty records are up to date for accurate profiling.</p>
                   </div>
-                  <Button size="sm" variant="outline" className="bg-background" asChild>
+                  <Button size="sm" variant="default" asChild>
                     <Link href="/profile">Update Now</Link>
                   </Button>
                 </CardContent>
