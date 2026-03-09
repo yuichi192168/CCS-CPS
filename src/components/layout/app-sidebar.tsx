@@ -107,7 +107,7 @@ export function AppSidebar() {
             />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="font-headline font-bold text-lg tracking-tight text-primary">PNC Profiling</span>
+            <span className="font-headline font-bold text-lg tracking-tight text-primary">CCS Profiling</span>
             <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider leading-none">University of Cabuyao</span>
           </div>
         </div>
