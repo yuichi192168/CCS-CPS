@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   BookOpen,
   Calendar,
-  ChevronRight,
   GraduationCap,
   LayoutDashboard,
   Library,
@@ -32,7 +31,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 
-const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const CCS_LOGO = "/images/ccs_logo.png"
 
 const navItems = [
   {
@@ -99,16 +98,20 @@ export function AppSidebar() {
         <div className="flex items-center gap-3">
           <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-background p-1.5 shadow-sm ring-1 ring-border overflow-hidden">
              <Image 
-              src={PNC_LOGO} 
-              alt="University Logo" 
+              src={CCS_LOGO} 
+              alt="CCS Logo" 
               width={28} 
               height={28}
               className="object-contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://i.imgur.com/5aAzmh5.png";
+              }}
             />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="font-headline font-bold text-lg tracking-tight text-primary">CCS Profiling</span>
-            <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider leading-none">University of Cabuyao</span>
+            <span className="font-headline font-bold text-lg tracking-tight text-primary">CCS CPS</span>
+            <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider leading-none">Pamantasan ng Cabuyao</span>
           </div>
         </div>
       </SidebarHeader>
@@ -157,7 +160,7 @@ export function AppSidebar() {
             <SidebarMenuButton asChild>
               <Link href="/profile">
                 <Settings className="size-4" />
-                <span>Account Settings</span>
+                <span>Settings</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

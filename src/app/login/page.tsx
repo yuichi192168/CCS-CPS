@@ -12,8 +12,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
-const PNC_BG = "https://i.imgur.com/tQ1GCYN.png"
+const CCS_LOGO = "/images/ccs_logo.png"
+const CCS_BG = "https://i.imgur.com/c2ywZT7.png"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -69,37 +69,41 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side: PNC Campus Background and Logo */}
+      {/* Left side: CCS Campus Background and Logo */}
       <div className="relative hidden w-1/2 lg:block">
-        <div className="absolute inset-0 z-10 bg-primary/40 mix-blend-multiply" />
+        <div className="absolute inset-0 z-10 bg-primary/20 mix-blend-multiply" />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-12 text-white">
           <div className="relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4 border-white/20 bg-white/10 p-4 backdrop-blur-md">
              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/95 p-4 shadow-2xl">
                 <Image 
-                  src={PNC_LOGO} 
-                  alt="University of Cabuyao Logo" 
+                  src={CCS_LOGO} 
+                  alt="CCS Logo" 
                   width={140} 
                   height={140}
                   className="object-contain"
                   priority
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://i.imgur.com/5aAzmh5.png";
+                  }}
                 />
              </div>
           </div>
           <h1 className="text-center font-headline text-5xl font-bold tracking-tight text-white drop-shadow-lg">
-            University of Cabuyao
+            College of Computer Studies
           </h1>
           <p className="mt-4 text-center text-xl font-medium text-white/90 drop-shadow-md">
             Pamantasan ng Cabuyao
           </p>
           <div className="mt-12 flex items-center gap-4 rounded-full bg-black/30 px-6 py-2 backdrop-blur-md">
-            <Badge variant="outline" className="border-white/40 text-white">EST. 2003</Badge>
+            <Badge variant="outline" className="border-white/40 text-white">CCS-CPS</Badge>
             <span className="h-4 w-px bg-white/20" />
-            <span className="text-sm font-medium tracking-wide">PEACE • EXCELLENCE • SERVICE</span>
+            <span className="text-sm font-medium tracking-wide">COMPREHENSIVE PROFILING SYSTEM</span>
           </div>
         </div>
         <Image
-          src={PNC_BG}
-          alt="Pamantasan ng Cabuyao Campus"
+          src={CCS_BG}
+          alt="CCS Background"
           fill
           className="object-cover"
           priority
@@ -113,18 +117,22 @@ export default function LoginPage() {
           <div className="flex flex-col items-center text-center">
             <div className="mb-8">
                <Image 
-                src={PNC_LOGO} 
-                alt="PNC Logo" 
+                src={CCS_LOGO} 
+                alt="CCS Logo" 
                 width={120} 
                 height={120}
                 className="rounded-full shadow-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://i.imgur.com/5aAzmh5.png";
+                }}
               />
             </div>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-primary">University of Cabuyao</h2>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mt-1">PAMANTASAN NG CABUYAO</p>
+              <h2 className="text-2xl font-bold text-primary">CCS Comprehensive Profiling</h2>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mt-1">UNIVERSITY OF CABUYAO</p>
             </div>
-            <Badge className="bg-[#e2f1e9] text-primary hover:bg-[#e2f1e9] font-bold text-sm py-2 px-10 rounded-md mb-8">
+            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 font-bold text-sm py-2 px-10 rounded-md mb-8">
               STUDENT / FACULTY / ADMIN LOGIN
             </Badge>
           </div>
@@ -137,8 +145,8 @@ export default function LoginPage() {
                 </div>
                 <Input
                   type="email"
-                  placeholder="Student ID / Email"
-                  className="h-14 pl-12 bg-blue-50/30 border-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
+                  placeholder="Email Address"
+                  className="h-14 pl-12 bg-muted/30 border-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -151,7 +159,7 @@ export default function LoginPage() {
                 <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="h-14 pl-12 pr-12 bg-blue-50/30 border-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
+                  className="h-14 pl-12 pr-12 bg-muted/30 border-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -167,7 +175,7 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-end">
-              <button type="button" className="text-sm font-bold text-accent hover:underline">
+              <button type="button" className="text-sm font-bold text-primary hover:underline">
                 Forgot Password?
               </button>
             </div>

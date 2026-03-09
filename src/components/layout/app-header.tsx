@@ -45,7 +45,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const CCS_LOGO = "/images/ccs_logo.png"
 
 export function AppHeader() {
   const router = useRouter()
@@ -102,7 +102,7 @@ export function AppHeader() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, { displayName })
-      toast({ title: "Account Created", description: "Welcome to CCS Profiling System!" })
+      toast({ title: "Account Created", description: "Welcome to CCS CPS!" })
       setIsAuthOpen(false)
       resetAuthFields()
       router.push("/")
@@ -134,7 +134,6 @@ export function AppHeader() {
     setPassword(demoEmail.split('@')[0] + "123")
   }
 
-  // Determine professional suit profile image based on role
   const profileImage = `/images/suit-${profile?.role || 'student'}.png`
 
   return (
@@ -145,14 +144,14 @@ export function AppHeader() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search resources..."
+            placeholder="Search CCS resources..."
             className="w-full bg-muted/50 pl-9 focus:bg-background"
           />
         </div>
       </div>
       <div className="flex items-center gap-4">
         {profile && (
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-semibold">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
             <ShieldCheck className="h-3 w-3" />
             <span className="capitalize">{profile.role}</span>
           </div>
@@ -163,20 +162,20 @@ export function AppHeader() {
             <Button variant="ghost" size="icon" className="relative text-muted-foreground">
               <Bell className="h-5 w-5" />
               {notifications.length > 0 && (
-                <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-accent"></span>
+                <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-primary"></span>
               )}
             </Button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Notifications</SheetTitle>
-              <SheetDescription>Stay updated with the latest college activities and system alerts.</SheetDescription>
+              <SheetTitle>CCS Notifications</SheetTitle>
+              <SheetDescription>Stay updated with the latest college activities.</SheetDescription>
             </SheetHeader>
             <div className="mt-6 space-y-4">
               {notifications.map((n) => (
                 <div key={n.id} className="flex gap-4 p-4 rounded-xl border bg-muted/5 hover:bg-muted/10 transition-all group">
                   <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${
-                    n.type === 'success' ? 'bg-accent' : 
+                    n.type === 'success' ? 'bg-green-500' : 
                     n.type === 'warning' ? 'bg-orange-500' : 'bg-primary'
                   }`} />
                   <div className="space-y-1">
@@ -186,12 +185,6 @@ export function AppHeader() {
                   </div>
                 </div>
               ))}
-              {notifications.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
-                  <Bell className="h-12 w-12 mb-4" />
-                  <p className="text-sm italic">No new notifications.</p>
-                </div>
-              )}
             </div>
           </SheetContent>
         </Sheet>
@@ -204,8 +197,7 @@ export function AppHeader() {
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
                     <Avatar className="h-9 w-9 ring-2 ring-primary/10">
                       <AvatarImage src={profileImage} alt="Profile" />
-                      <AvatarImage src={PNC_LOGO} alt="Fallback" />
-                      <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}</AvatarFallback>
+                      <AvatarFallback>{user.displayName?.charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -247,106 +239,49 @@ export function AppHeader() {
                     
                     <TabsContent value="login" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
-                        <Image src={PNC_LOGO} alt="PNC Logo" width={60} height={60} className="mb-2" />
-                        <DialogTitle>University of Cabuyao</DialogTitle>
+                        <Image src={CCS_LOGO} alt="CCS Logo" width={60} height={60} className="mb-2" />
+                        <DialogTitle>CCS CPS Portal</DialogTitle>
                         <DialogDescription>
-                          Pamantasan ng Cabuyao Academic Portal
+                          College of Computer Studies Portal
                         </DialogDescription>
                       </DialogHeader>
-
-                      <Alert className="bg-primary/5 border-primary/20">
-                        <Info className="h-4 w-4 text-primary" />
-                        <AlertTitle className="text-sm font-semibold text-primary">Demo Notice</AlertTitle>
-                        <AlertDescription className="text-xs text-muted-foreground">
-                          If you haven't used a demo account yet, please **Sign Up** first to create it.
-                        </AlertDescription>
-                      </Alert>
 
                       <form onSubmit={handleLogin} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
-                          <Input 
-                            id="email" 
-                            type="email" 
-                            placeholder="m@ccs.edu.ph" 
-                            required 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
+                          <Input id="email" type="email" placeholder="m@ccs.edu.ph" required value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="password">Password</Label>
-                          <Input 
-                            id="password" 
-                            type="password" 
-                            required 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                          />
+                          <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <Button type="submit" className="w-full" disabled={authLoading}>
                           {authLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <LogIn className="h-4 w-4 mr-2" />}
                           Sign In
                         </Button>
                       </form>
-
-                      <div className="mt-6 rounded-lg bg-muted/50 p-4 border border-border">
-                        <div className="flex items-center gap-2 mb-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                          Quick Demo Access
-                        </div>
-                        <div className="grid grid-cols-1 gap-2">
-                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('admin@ccs.edu.ph')}>
-                             Admin: <span className="ml-1 font-bold">admin@ccs.edu.ph</span>
-                           </Button>
-                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('faculty@ccs.edu.ph')}>
-                             Faculty: <span className="ml-1 font-bold">faculty@ccs.edu.ph</span>
-                           </Button>
-                           <Button variant="outline" size="sm" className="justify-start font-normal text-xs h-8 hover:bg-primary/5 hover:text-primary" onClick={() => fillDemo('student@ccs.edu.ph')}>
-                             Student: <span className="ml-1 font-bold">student@ccs.edu.ph</span>
-                           </Button>
-                        </div>
-                      </div>
                     </TabsContent>
 
                     <TabsContent value="signup" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
-                        <Image src={PNC_LOGO} alt="PNC Logo" width={60} height={60} className="mb-2" />
-                        <DialogTitle>Create Account</DialogTitle>
+                        <Image src={CCS_LOGO} alt="CCS Logo" width={60} height={60} className="mb-2" />
+                        <DialogTitle>Create CCS Account</DialogTitle>
                         <DialogDescription>
-                          Register for the PNC CCS Profiling System.
+                          Register for the CCS Profiling System.
                         </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleSignUp} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="signup-name">Full Name</Label>
-                          <Input 
-                            id="signup-name" 
-                            placeholder="Juan Dela Cruz" 
-                            required 
-                            value={displayName}
-                            onChange={(e) => setDisplayName(e.target.value)}
-                          />
+                          <Input id="signup-name" placeholder="Juan Dela Cruz" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="signup-email">Email</Label>
-                          <Input 
-                            id="signup-email" 
-                            type="email" 
-                            placeholder="m@ccs.edu.ph" 
-                            required 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
+                          <Input id="signup-email" type="email" placeholder="m@ccs.edu.ph" required value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="signup-password">Password</Label>
-                          <Input 
-                            id="signup-password" 
-                            type="password" 
-                            required 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                          />
+                          <Input id="signup-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <Button type="submit" className="w-full" disabled={authLoading}>
                           {authLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <UserPlus className="h-4 w-4 mr-2" />}
