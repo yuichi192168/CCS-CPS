@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2, Info } from "lucide-react"
+import { Bell, Search, LogOut, LogIn, ShieldCheck, UserPlus, Loader2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/firebase"
@@ -43,9 +43,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-const CCS_LOGO = "/images/ccs_logo.png"
+const CCS_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 export function AppHeader() {
   const router = useRouter()
@@ -66,20 +65,6 @@ export function AppHeader() {
     { id: 3, title: "Midterm Schedule", description: "The midterm examination schedule is now available.", time: "1d ago", type: "warning" },
   ])
 
-  const handleAuthError = (error: any) => {
-    let message = error.message;
-    if (error.code === 'auth/operation-not-allowed') {
-      message = "Email/Password sign-in is disabled. Please enable it in the Firebase Console.";
-    } else if (error.code === 'auth/invalid-credential') {
-      message = "Invalid credentials. If this is a new demo account, please use the 'Sign Up' tab first to create it.";
-    }
-    toast({ 
-      title: "Authentication Error", 
-      description: message, 
-      variant: "destructive" 
-    });
-  }
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setAuthLoading(true)
@@ -87,10 +72,9 @@ export function AppHeader() {
       await signInWithEmailAndPassword(auth, email, password)
       toast({ title: "Welcome back!", description: "Successfully signed in." })
       setIsAuthOpen(false)
-      resetAuthFields()
       router.push("/")
     } catch (error: any) {
-      handleAuthError(error)
+      toast({ title: "Login Failed", description: error.message, variant: "destructive" })
     } finally {
       setAuthLoading(false)
     }
@@ -102,21 +86,14 @@ export function AppHeader() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, { displayName })
-      toast({ title: "Account Created", description: "Welcome to CCS CPS!" })
+      toast({ title: "Account Created", description: "Welcome to CCS-CPS!" })
       setIsAuthOpen(false)
-      resetAuthFields()
       router.push("/")
     } catch (error: any) {
-      handleAuthError(error)
+      toast({ title: "Sign Up Failed", description: error.message, variant: "destructive" })
     } finally {
       setAuthLoading(false)
     }
-  }
-
-  const resetAuthFields = () => {
-    setEmail("")
-    setPassword("")
-    setDisplayName("")
   }
 
   const handleLogout = async () => {
@@ -127,11 +104,6 @@ export function AppHeader() {
     } catch (error: any) {
       toast({ title: "Error", description: "Failed to sign out.", variant: "destructive" })
     }
-  }
-
-  const fillDemo = (demoEmail: string) => {
-    setEmail(demoEmail)
-    setPassword(demoEmail.split('@')[0] + "123")
   }
 
   const profileImage = `/images/suit-${profile?.role || 'student'}.png`
@@ -168,19 +140,19 @@ export function AppHeader() {
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>CCS Notifications</SheetTitle>
-              <SheetDescription>Stay updated with the latest college activities.</SheetDescription>
+              <SheetTitle>Notifications</SheetTitle>
+              <SheetDescription>Latest updates for your profile.</SheetDescription>
             </SheetHeader>
             <div className="mt-6 space-y-4">
               {notifications.map((n) => (
-                <div key={n.id} className="flex gap-4 p-4 rounded-xl border bg-muted/5 hover:bg-muted/10 transition-all group">
+                <div key={n.id} className="flex gap-4 p-4 rounded-xl border bg-muted/5 hover:bg-muted/10 transition-all">
                   <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${
                     n.type === 'success' ? 'bg-green-500' : 
                     n.type === 'warning' ? 'bg-orange-500' : 'bg-primary'
                   }`} />
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold leading-none text-foreground">{n.title}</p>
-                    <p className="text-xs text-muted-foreground leading-snug">{n.description}</p>
+                    <p className="text-sm font-semibold">{n.title}</p>
+                    <p className="text-xs text-muted-foreground">{n.description}</p>
                     <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-tighter mt-2">{n.time}</p>
                   </div>
                 </div>
@@ -209,11 +181,9 @@ export function AppHeader() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <a href="/profile" className="flex w-full items-center">
-                      <ShieldCheck className="mr-2 h-4 w-4" />
-                      <span>My Profile</span>
-                    </a>
+                  <DropdownMenuItem onClick={() => router.push("/profile")}>
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
@@ -240,7 +210,7 @@ export function AppHeader() {
                     <TabsContent value="login" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
                         <Image src={CCS_LOGO} alt="CCS Logo" width={60} height={60} className="mb-2" />
-                        <DialogTitle>CCS CPS Portal</DialogTitle>
+                        <DialogTitle>CCS-CPS Portal</DialogTitle>
                         <DialogDescription>
                           College of Computer Studies Portal
                         </DialogDescription>
@@ -265,7 +235,7 @@ export function AppHeader() {
                     <TabsContent value="signup" className="space-y-4 pt-4">
                       <DialogHeader className="flex flex-col items-center">
                         <Image src={CCS_LOGO} alt="CCS Logo" width={60} height={60} className="mb-2" />
-                        <DialogTitle>Create CCS Account</DialogTitle>
+                        <DialogTitle>Create Account</DialogTitle>
                         <DialogDescription>
                           Register for the CCS Profiling System.
                         </DialogDescription>

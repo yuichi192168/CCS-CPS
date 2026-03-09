@@ -49,12 +49,14 @@ export function useUserProfile() {
             role = 'faculty';
           }
 
+          const photoURL = `/images/suit-${role}.png`;
+
           const newProfile: UserProfile = {
             uid: authUser.uid,
             email: authUser.email || '',
             displayName: authUser.displayName || email.split('@')[0],
             role: role,
-            photoURL: authUser.photoURL || '',
+            photoURL: photoURL,
             createdAt: serverTimestamp(),
           };
           

@@ -31,7 +31,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 
-const CCS_LOGO = "/images/ccs_logo.png"
+const CCS_LOGO = "https://i.imgur.com/5aAzmh5.png"
 
 const navItems = [
   {
@@ -103,14 +103,10 @@ export function AppSidebar() {
               width={28} 
               height={28}
               className="object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://i.imgur.com/5aAzmh5.png";
-              }}
             />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-            <span className="font-headline font-bold text-lg tracking-tight text-primary">CCS CPS</span>
+            <span className="font-headline font-bold text-lg tracking-tight text-primary">CCS-CPS</span>
             <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider leading-none">Pamantasan ng Cabuyao</span>
           </div>
         </div>
