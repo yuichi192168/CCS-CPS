@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -23,7 +22,7 @@ import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function StudentsPage() {
   const db = useFirestore()
@@ -64,7 +63,6 @@ export default function StudentsPage() {
       imageUrl: "/images/suit-student.png"
     }
 
-    // Using setDoc with the studentId as the document reference to avoid random UIDs
     const studentRef = doc(db, "students", studentId)
     setDoc(studentRef, newStudent)
       .then(() => {
@@ -218,7 +216,7 @@ export default function StudentsPage() {
                             <div className="flex items-center gap-3">
                               <Avatar className="h-9 w-9 ring-1 ring-border">
                                 <AvatarImage src={student.imageUrl} alt={student.name} />
-                                <AvatarImage src={PNC_LOGO} alt="Fallback" />
+                                <AvatarImage src={CCS_LOGO} alt="Fallback" />
                                 <AvatarFallback>{student.name[0]}</AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">

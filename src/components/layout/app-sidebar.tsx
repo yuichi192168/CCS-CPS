@@ -31,8 +31,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 
-const CCS_LOGO = "/images/ccs_logo.png"
-const FALLBACK_LOGO = "https://i.imgur.com/c2ywZT7.png"
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 const navItems = [
   {
@@ -104,10 +103,7 @@ export function AppSidebar() {
               width={28} 
               height={28}
               className="object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = FALLBACK_LOGO;
-              }}
+              unoptimized
             />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">

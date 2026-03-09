@@ -44,8 +44,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const CCS_LOGO = "/images/ccs_logo.png"
-const FALLBACK_LOGO = "https://i.imgur.com/c2ywZT7.png"
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export function AppHeader() {
   const router = useRouter()
@@ -215,11 +214,8 @@ export function AppHeader() {
                           alt="CCS Logo" 
                           width={60} 
                           height={60} 
-                          className="mb-2" 
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = FALLBACK_LOGO;
-                          }}
+                          className="mb-2"
+                          unoptimized
                         />
                         <DialogTitle>CCS-CPS Portal</DialogTitle>
                         <DialogDescription>
@@ -251,10 +247,7 @@ export function AppHeader() {
                           width={60} 
                           height={60} 
                           className="mb-2"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = FALLBACK_LOGO;
-                          }}
+                          unoptimized
                         />
                         <DialogTitle>Create Account</DialogTitle>
                         <DialogDescription>

@@ -12,8 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Loader2, User, Lock, Eye, EyeOff, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-const CCS_LOGO = "/images/ccs_logo.png"
-const FALLBACK_LOGO = "https://i.imgur.com/c2ywZT7.png"
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -81,10 +80,7 @@ export default function LoginPage() {
                   height={140}
                   className="object-contain"
                   priority
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = FALLBACK_LOGO;
-                  }}
+                  unoptimized
                 />
              </div>
           </div>
@@ -113,10 +109,7 @@ export default function LoginPage() {
                 width={120} 
                 height={120}
                 className="rounded-full shadow-lg"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = FALLBACK_LOGO;
-                }}
+                unoptimized
               />
             </div>
             <div className="mb-8">

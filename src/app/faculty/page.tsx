@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -20,7 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
-const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function FacultyPage() {
   const db = useFirestore()
@@ -135,7 +134,7 @@ export default function FacultyPage() {
                     <CardContent className="relative flex flex-col items-center p-6 pt-0">
                       <Avatar className="h-20 w-20 -mt-10 border-4 border-background ring-2 ring-primary/5 shadow-md">
                         <AvatarImage src={member.image} alt={member.name} />
-                        <AvatarImage src={PNC_LOGO} alt="Fallback" />
+                        <AvatarImage src={CCS_LOGO} alt="Fallback" />
                         <AvatarFallback>{member.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="mt-4 text-center">
