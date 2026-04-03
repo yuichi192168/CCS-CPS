@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
@@ -53,17 +53,37 @@ export function AppHeader() {
   const { toast } = useToast()
   
   const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [displayName, setDisplayName] = useState("")
 
-  const [notifications] = useState([
-    { id: 1, title: "System Maintenance", description: "Scheduled maintenance on Sunday at 2:00 AM.", time: "2h ago", type: "info" },
-    { id: 2, title: "New Research Paper", description: "A new study on AI in Agriculture has been published.", time: "5h ago", type: "success" },
-    { id: 3, title: "Midterm Schedule", description: "The midterm examination schedule is now available.", time: "1d ago", type: "warning" },
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: "System Maintenance", description: "Scheduled maintenance on Sunday at 2:00 AM.", time: "2h ago", type: "info", read: false },
+    { id: 2, title: "New Research Paper", description: "A new study on AI in Agriculture has been published.", time: "5h ago", type: "success", read: false },
+    { id: 3, title: "Midterm Schedule", description: "The midterm examination schedule is now available.", time: "1d ago", type: "warning", read: true },
   ])
+
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.read).length,
+    [notifications]
+  )
+
+  const markNotificationAsRead = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    )
+  }
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  }
+
+  const clearNotifications = () => {
+    setNotifications([])
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,12 +149,14 @@ export function AppHeader() {
           </div>
         )}
         
-        <Sheet>
+        <Sheet open={isNotificationOpen} onOpenChange={setIsNotificationOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="relative text-muted-foreground">
               <Bell className="h-5 w-5" />
-              {notifications.length > 0 && (
-                <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-primary"></span>
+              {unreadCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
               )}
             </Button>
           </SheetTrigger>
@@ -143,19 +165,34 @@ export function AppHeader() {
               <SheetTitle>Notifications</SheetTitle>
               <SheetDescription>Latest updates for your profile.</SheetDescription>
             </SheetHeader>
-            <div className="mt-6 space-y-4">
-              {notifications.map((n) => (
-                <div key={n.id} className="flex gap-4 p-4 rounded-xl border bg-muted/5 hover:bg-muted/10 transition-all">
-                  <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${
-                    n.type === 'success' ? 'bg-green-500' : 
-                    n.type === 'warning' ? 'bg-orange-500' : 'bg-primary'
-                  }`} />
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold">{n.title}</p>
-                    <p className="text-xs text-muted-foreground">{n.description}</p>
-                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-tighter mt-2">{n.time}</p>
-                  </div>
+            <div className="mt-4 flex items-center justify-end gap-2 border-b pb-4">
+              <Button variant="outline" size="sm" onClick={markAllAsRead} disabled={unreadCount === 0}>Mark all read</Button>
+              <Button variant="ghost" size="sm" onClick={clearNotifications} disabled={notifications.length === 0}>Clear all</Button>
+            </div>
+            <div className="mt-4 space-y-3">
+              {notifications.length === 0 ? (
+                <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+                  No notifications.
                 </div>
+              ) : notifications.map((n) => (
+                <button
+                  key={n.id}
+                  type="button"
+                  onClick={() => markNotificationAsRead(n.id)}
+                  className={`w-full rounded-xl border p-4 text-left transition-all hover:bg-muted/10 ${n.read ? "bg-background" : "bg-muted/10"}`}
+                >
+                  <div className="flex gap-4">
+                    <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${
+                      n.type === 'success' ? 'bg-green-500' :
+                      n.type === 'warning' ? 'bg-orange-500' : 'bg-primary'
+                    } ${n.read ? 'opacity-40' : ''}`} />
+                    <div className="space-y-1">
+                      <p className={`text-sm ${n.read ? "font-medium" : "font-semibold"}`}>{n.title}</p>
+                      <p className="text-xs text-muted-foreground">{n.description}</p>
+                      <p className="mt-2 text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/50">{n.time}</p>
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           </SheetContent>
