@@ -193,7 +193,7 @@ export default function StudentsPage() {
       specialization: i % 2 === 0 ? "Software Engineering" : "Data Science",
       publications: 2 + i,
       email: `${name.toLowerCase()}.faculty@pnc.edu.ph`,
-      image: "/images/suit-faculty.png",
+      image: CCS_LOGO,
     }))
 
     const currentYear = new Date().getFullYear()

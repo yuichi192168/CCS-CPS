@@ -45,7 +45,7 @@ export default function FacultyPage() {
       specialization: formData.get("specialization") as string,
       publications: 0,
       email: formData.get("email") as string,
-      image: "/images/suit-faculty.png",
+      image: CCS_LOGO,
     }
 
     const facultyRef = collection(db, "faculty")
@@ -135,8 +135,7 @@ export default function FacultyPage() {
                     <div className="h-24 bg-primary group-hover:bg-primary/90 transition-colors" />
                     <CardContent className="relative flex flex-col items-center p-6 pt-0">
                       <Avatar className="h-20 w-20 -mt-10 border-4 border-background ring-2 ring-primary/5 shadow-md">
-                        <AvatarImage src={member.image} alt={member.name} />
-                        <AvatarImage src={CCS_LOGO} alt="Fallback" />
+                        <AvatarImage src={member.image || CCS_LOGO} alt={member.name} />
                         <AvatarFallback>{member.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="mt-4 text-center">
