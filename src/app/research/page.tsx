@@ -13,6 +13,7 @@ import { useCollection, useFirestore, useUser } from "@/firebase"
 import { collection, query, orderBy, addDoc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
@@ -22,6 +23,11 @@ export default function ResearchPage() {
   const { user } = useUser()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [yearFilter, setYearFilter] = useState("all")
+  const [tagFilter, setTagFilter] = useState("all")
+  const [selectedPaper, setSelectedPaper] = useState<any | null>(null)
+  const [isAbstractOpen, setIsAbstractOpen] = useState(false)
 
   const researchQuery = useMemo(() => {
     if (!db) return null
@@ -29,6 +35,34 @@ export default function ResearchPage() {
   }, [db])
 
   const { data: papers, loading, error } = useCollection(researchQuery)
+
+  const availableYears = useMemo(() => {
+    const years = (papers || []).map((p: any) => String(p.year || "")).filter(Boolean)
+    return Array.from(new Set(years)).sort((a, b) => Number(b) - Number(a))
+  }, [papers])
+
+  const availableTags = useMemo(() => {
+    const tags = (papers || []).flatMap((p: any) => (p.tags || []).map((t: string) => t.trim())).filter(Boolean)
+    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b))
+  }, [papers])
+
+  const filteredPapers = useMemo(() => {
+    if (!papers) return []
+
+    return papers.filter((paper: any) => {
+      const title = (paper.title || "").toLowerCase()
+      const authors = (paper.authors || "").toLowerCase()
+      const abstract = (paper.abstract || "").toLowerCase()
+      const tags = (paper.tags || []).join(" ").toLowerCase()
+      const q = searchTerm.toLowerCase().trim()
+
+      const matchSearch = !q || title.includes(q) || authors.includes(q) || abstract.includes(q) || tags.includes(q)
+      const matchYear = yearFilter === "all" || String(paper.year) === yearFilter
+      const matchTag = tagFilter === "all" || (paper.tags || []).includes(tagFilter)
+
+      return matchSearch && matchYear && matchTag
+    })
+  }, [papers, searchTerm, yearFilter, tagFilter])
 
   const handleAddResearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -56,6 +90,35 @@ export default function ResearchPage() {
         })
         errorEmitter.emit("permission-error", permissionError)
       })
+  }
+
+  const handleDownloadSummary = (paper: any) => {
+    const content = [
+      `Title: ${paper.title || "N/A"}`,
+      `Authors: ${paper.authors || "N/A"}`,
+      `Year: ${paper.year || "N/A"}`,
+      `Tags: ${(paper.tags || []).join(", ")}`,
+      "",
+      `Abstract: ${paper.abstract || "No abstract provided."}`,
+    ].join("\n")
+
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${(paper.title || "research-paper").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleOpenReference = (paper: any) => {
+    const queryText = encodeURIComponent(`${paper.title || ""} ${paper.authors || ""}`.trim())
+    window.open(`https://scholar.google.com/scholar?q=${queryText}`, "_blank", "noopener,noreferrer")
+  }
+
+  const handleViewAbstract = (paper: any) => {
+    setSelectedPaper(paper)
+    setIsAbstractOpen(true)
   }
 
   return (
@@ -118,12 +181,49 @@ export default function ResearchPage() {
             <div className="flex flex-col gap-4 md:flex-row">
               <div className="relative flex-1">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search by title, author, or keyword..." className="pl-9 h-11" />
+                <Input
+                  placeholder="Search by title, author, abstract, or keyword..."
+                  className="pl-9 h-11"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <Button variant="outline" className="h-11 gap-2">
-                <Filter className="h-4 w-4" />
-                Advanced Filtering
-              </Button>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Select value={yearFilter} onValueChange={setYearFilter}>
+                  <SelectTrigger className="h-11 min-w-[140px]">
+                    <SelectValue placeholder="Filter year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Years</SelectItem>
+                    {availableYears.map((year) => (
+                      <SelectItem key={year} value={year}>{year}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={tagFilter} onValueChange={setTagFilter}>
+                  <SelectTrigger className="h-11 min-w-[160px]">
+                    <SelectValue placeholder="Filter tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {availableTags.map((tag) => (
+                      <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  className="h-11 gap-2"
+                  onClick={() => {
+                    setSearchTerm("")
+                    setYearFilter("all")
+                    setTagFilter("all")
+                  }}
+                >
+                  <Filter className="h-4 w-4" />
+                  Clear
+                </Button>
+              </div>
             </div>
 
             {loading ? (
@@ -136,7 +236,7 @@ export default function ResearchPage() {
               </div>
             ) : (
               <div className="grid gap-4">
-                {papers?.map((paper: any) => (
+                {filteredPapers.map((paper: any) => (
                   <Card key={paper.id} className="shadow-sm border-none ring-1 ring-border hover:ring-accent transition-all">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
@@ -150,8 +250,12 @@ export default function ResearchPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="icon"><Download className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon"><ExternalLink className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDownloadSummary(paper)}>
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleOpenReference(paper)}>
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     </CardHeader>
@@ -163,18 +267,40 @@ export default function ResearchPage() {
                       </div>
                       <div className="pt-4 border-t flex items-center justify-between">
                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cited by {paper.citation || 0} papers</span>
-                         <Button variant="link" size="sm" className="h-auto p-0 text-accent">Read Full Abstract →</Button>
+                         <Button variant="link" size="sm" className="h-auto p-0 text-accent" onClick={() => handleViewAbstract(paper)}>
+                           Read Full Abstract →
+                         </Button>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
-                {(!papers || papers.length === 0) && (
+                {(filteredPapers.length === 0) && (
                   <div className="py-20 text-center text-muted-foreground italic">
-                    No research records found.
+                    No research records found for the current filters.
                   </div>
                 )}
               </div>
             )}
+
+            <Dialog open={isAbstractOpen} onOpenChange={setIsAbstractOpen}>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{selectedPaper?.title || "Research Abstract"}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 text-sm">
+                  <p className="text-muted-foreground">
+                    <span className="font-semibold text-foreground">Authors: </span>
+                    {selectedPaper?.authors || "N/A"}
+                  </p>
+                  <p className="leading-relaxed text-muted-foreground">
+                    {selectedPaper?.abstract || "No abstract provided for this paper."}
+                  </p>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsAbstractOpen(false)}>Close</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </main>
       </SidebarInset>

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Mail, Search, Loader2, Plus, Trash2 } from "lucide-react"
+import { Mail, Search, Loader2, Plus, Trash2, Pencil, Eye } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
@@ -195,43 +195,44 @@ export default function FacultyPage() {
                         <Badge variant="secondary" className="text-[10px]">{member.publications || 0} Publications</Badge>
                         <Badge variant="outline" className="text-[10px]">Active Researcher</Badge>
                       </div>
-                      <div className="mt-6 flex w-full gap-2">
-                        <Button variant="outline" size="sm" className="flex-1 gap-2" asChild>
+                      <div className="mt-6 flex w-full items-center justify-center gap-2">
+                        <Button variant="outline" size="icon" title="Email" aria-label="Email" asChild>
                           <a href={`mailto:${member.email}`}>
-                            <Mail className="h-3 w-3" />
-                            Email
+                            <Mail className="h-4 w-4" />
                           </a>
                         </Button>
                         {(profile?.role === "admin") && (
                           <Button
                             variant="outline"
-                            size="sm"
-                            className="flex-1"
+                            size="icon"
+                            title="Edit Info"
+                            aria-label="Edit Info"
                             onClick={() => {
                               setEditFaculty(member)
                               setIsDialogOpen(true)
                             }}
                           >
-                            Edit Info
+                            <Pencil className="h-4 w-4" />
                           </Button>
                         )}
                         {(profile?.role === "admin") && (
                           <Button
                             variant="destructive"
-                            size="sm"
-                            className="flex-1 gap-1"
+                            size="icon"
+                            title="Delete"
+                            aria-label="Delete"
                             onClick={() => handleDeleteFaculty(member.docId || member.id)}
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            Delete
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         )}
                         <Button
-                          size="sm"
-                          className="flex-1"
+                          size="icon"
+                          title="View Profile"
+                          aria-label="View Profile"
                           onClick={() => router.push(`/faculty/profile?id=${member.docId || member.id}`)}
                         >
-                          View Profile
+                          <Eye className="h-4 w-4" />
                         </Button>
                       </div>
                     </CardContent>
