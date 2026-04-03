@@ -135,12 +135,12 @@ export default function StudentsPage() {
                       Enroll New Student
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-2xl">
                     <form onSubmit={handleAddOrEditStudent}>
                       <DialogHeader>
                         <DialogTitle>{editStudent ? "Edit Student" : "Enroll Student"}</DialogTitle>
                       </DialogHeader>
-                      <div className="grid gap-4 py-4">
+                      <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-1">
                         <div className="grid gap-2">
                           <Label htmlFor="studentId">Student ID</Label>
                           <Input id="studentId" name="studentId" placeholder="2024-0001" required defaultValue={editStudent?.id || ""} disabled={!!editStudent} />
@@ -153,7 +153,7 @@ export default function StudentsPage() {
                           <Label htmlFor="email">Email Address</Label>
                           <Input id="email" name="email" type="email" placeholder="juan@pnc.edu.ph" required defaultValue={editStudent?.email || ""} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div className="grid gap-2">
                             <Label htmlFor="course">Course / Strand</Label>
                             <Input id="course" name="course" placeholder="BSCS" required defaultValue={editStudent?.course || ""} />

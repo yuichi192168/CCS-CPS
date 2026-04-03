@@ -78,12 +78,12 @@ export default function ResearchPage() {
                     Submit New Research
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[525px]">
+                <DialogContent className="sm:max-w-xl">
                   <form onSubmit={handleAddResearch}>
                     <DialogHeader>
                       <DialogTitle>Submit Research Paper</DialogTitle>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-1">
                       <div className="grid gap-2">
                         <Label htmlFor="title">Title</Label>
                         <Input id="title" name="title" placeholder="Paper Title" required />
@@ -92,7 +92,7 @@ export default function ResearchPage() {
                         <Label htmlFor="authors">Authors (comma separated)</Label>
                         <Input id="authors" name="authors" placeholder="Author Name, Another Author" required />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
                           <Label htmlFor="year">Year</Label>
                           <Input id="year" name="year" type="number" defaultValue={new Date().getFullYear()} required />

@@ -79,17 +79,17 @@ export default function EventsPage() {
                     Add Event
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-xl">
                   <form onSubmit={handleAddEvent}>
                     <DialogHeader>
                       <DialogTitle>Add Academic Event</DialogTitle>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-1">
                       <div className="grid gap-2">
                         <Label htmlFor="title">Event Title</Label>
                         <Input id="title" name="title" placeholder="Midterm Exams, Hackathon, etc." required />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
                           <Label htmlFor="date">Date</Label>
                           <Input id="date" name="date" type="date" required />

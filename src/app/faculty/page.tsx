@@ -86,12 +86,12 @@ export default function FacultyPage() {
                       Add Faculty
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-xl">
                     <form onSubmit={handleAddFaculty}>
                       <DialogHeader>
                         <DialogTitle>Add Faculty Member</DialogTitle>
                       </DialogHeader>
-                      <div className="grid gap-4 py-4">
+                      <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-1">
                         <div className="grid gap-2">
                           <Label htmlFor="name">Full Name</Label>
                           <Input id="name" name="name" placeholder="Dr. Alan Turing" required />
