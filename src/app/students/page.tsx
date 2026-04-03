@@ -60,22 +60,16 @@ export default function StudentsPage() {
   const handleAddOrEditStudent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-<<<<<<< HEAD
-    const studentData = {
-      id: formData.get("studentId") as string,
-=======
     const studentId = formData.get("studentId") as string
-    
-    const newStudent = {
+
+    const studentData = {
       id: studentId,
->>>>>>> 5c3091ad215c99085b9216e864514a4001431f71
       name: formData.get("name") as string,
       course: formData.get("course") as string,
       year: formData.get("year") as string,
       academicYear: formData.get("academicYear") as string,
       status: formData.get("status") as string,
       email: formData.get("email") as string,
-<<<<<<< HEAD
       imageUrl: `https://picsum.photos/seed/${formData.get("studentId")}/200`,
       academicHistory: formData.get("academicHistory") as string,
       activities: formData.get("activities") as string,
@@ -83,58 +77,26 @@ export default function StudentsPage() {
       skills: (formData.get("skills") as string).split(",").map(s => s.trim()).filter(Boolean),
       affiliations: (formData.get("affiliations") as string).split(",").map(a => a.trim()).filter(Boolean),
     }
-    const studentsRef = collection(db, "students")
-    if (editStudent) {
-      // Update existing student
-      const studentDoc = doc(db, "students", editStudent._id || editStudent.id)
-      import("firebase/firestore").then(({ updateDoc }) => {
-        updateDoc(studentDoc, studentData)
-          .then(() => {
-            setIsDialogOpen(false)
-            setEditStudent(null)
-            toast({ title: "Success", description: "Student record updated." })
-          })
-          .catch(async (serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: studentDoc.path,
-              operation: "update",
-              requestResourceData: studentData,
-            })
-            errorEmitter.emit("permission-error", permissionError)
-          })
-      })
-    } else {
-      // Add new student
-      addDoc(studentsRef, studentData)
-        .then(() => {
-          setIsDialogOpen(false)
-          toast({ title: "Success", description: "Student enrolled successfully." })
-=======
-      imageUrl: "/images/suit-student.png"
-    }
 
-    const studentRef = doc(db, "students", studentId)
-    setDoc(studentRef, newStudent)
+    const targetId = editStudent?.id || studentId
+    const studentRef = doc(db, "students", targetId)
+    setDoc(studentRef, studentData, { merge: true })
       .then(() => {
         setIsDialogOpen(false)
-        toast({ title: "Success", description: "Student enrolled successfully." })
+        setEditStudent(null)
+        toast({
+          title: "Success",
+          description: editStudent ? "Student record updated." : "Student enrolled successfully.",
+        })
       })
       .catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
           path: studentRef.path,
-          operation: "create",
-          requestResourceData: newStudent,
->>>>>>> 5c3091ad215c99085b9216e864514a4001431f71
-        })
-        .catch(async (serverError) => {
-          const permissionError = new FirestorePermissionError({
-            path: studentsRef.path,
-            operation: "create",
+          operation: editStudent ? "update" : "create",
             requestResourceData: studentData,
           })
           errorEmitter.emit("permission-error", permissionError)
-        })
-    }
+      })
   }
 
   const handleDeleteStudent = (studentId: string) => {
@@ -375,14 +337,8 @@ export default function StudentsPage() {
                         <Card key={student.id} className="border shadow-sm">
                           <CardHeader>
                             <div className="flex items-center gap-3">
-<<<<<<< HEAD
-                              <Avatar className="h-12 w-12 ring-1 ring-border">
-                                <AvatarImage src={student.imageUrl} />
-=======
                               <Avatar className="h-9 w-9 ring-1 ring-border">
-                                <AvatarImage src={student.imageUrl} alt={student.name} />
-                                <AvatarImage src={CCS_LOGO} alt="Fallback" />
->>>>>>> 5c3091ad215c99085b9216e864514a4001431f71
+                                <AvatarImage src={student.imageUrl || CCS_LOGO} alt={student.name} />
                                 <AvatarFallback>{student.name[0]}</AvatarFallback>
                               </Avatar>
                               <div>
