@@ -15,6 +15,25 @@ const config = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+const requiredConfigMap: Record<string, string | undefined> = {
+  NEXT_PUBLIC_FIREBASE_API_KEY: config.apiKey,
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: config.authDomain,
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: config.projectId,
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: config.storageBucket,
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: config.messagingSenderId,
+  NEXT_PUBLIC_FIREBASE_APP_ID: config.appId,
+};
+
+export function getMissingFirebaseEnvVars() {
+  return Object.entries(requiredConfigMap)
+    .filter(([, value]) => !value || value.trim() === '')
+    .map(([key]) => key);
+}
+
+export function isFirebaseConfigValid() {
+  return getMissingFirebaseEnvVars().length === 0;
+}
+
 // Log a warning in development if keys are missing
 if (typeof window !== 'undefined' && !config.apiKey && process.env.NODE_ENV === 'development') {
   console.warn(

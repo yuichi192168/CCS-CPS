@@ -3,9 +3,17 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { firebaseConfig } from './config';
+import { firebaseConfig, getMissingFirebaseEnvVars, isFirebaseConfigValid } from './config';
 
 export function initializeFirebase() {
+  if (!isFirebaseConfigValid()) {
+    const missingVars = getMissingFirebaseEnvVars();
+    throw new Error(
+      `Missing Firebase environment variables: ${missingVars.join(', ')}. ` +
+      'Add them to .env.local (local) or your hosting provider environment settings.'
+    );
+  }
+
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
