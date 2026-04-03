@@ -31,6 +31,7 @@ export default function StudentsPage() {
   const [editStudent, setEditStudent] = useState<any | null>(null)
   const [viewMode, setViewMode] = useState<'table' | 'card' | 'list'>('table')
   const [formStatus, setFormStatus] = useState("Active")
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
   const router = useRouter()
   const db = useFirestore()
   const { profile } = useUserProfile()
@@ -109,6 +110,7 @@ export default function StudentsPage() {
         setIsDialogOpen(false)
         setEditStudent(null)
         setFormStatus("Active")
+        setActiveMenuId(null)
         toast({
           title: "Success",
           description: editStudent ? "Student record updated." : "Student enrolled successfully.",
@@ -294,6 +296,7 @@ export default function StudentsPage() {
                     if (!open) {
                       setEditStudent(null)
                       setFormStatus("Active")
+                      setActiveMenuId(null)
                     }
                   }}
                 >
@@ -494,7 +497,7 @@ export default function StudentsPage() {
                       </TableHeader>
                       <TableBody>
                         {filteredStudents.map((student: any) => (
-                          <TableRow key={student.id} className="cursor-default hover:bg-muted/20 transition-colors">
+                          <TableRow key={student.docId || student.id} className="cursor-default hover:bg-muted/20 transition-colors">
                             <TableCell className="font-mono text-xs font-semibold">{student.id}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -527,7 +530,11 @@ export default function StudentsPage() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                              <DropdownMenu>
+                              <DropdownMenu
+                                modal={false}
+                                open={activeMenuId === (student.docId || student.id)}
+                                onOpenChange={(open) => setActiveMenuId(open ? (student.docId || student.id) : null)}
+                              >
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="icon">
                                     <MoreHorizontal className="h-4 w-4" />
@@ -542,6 +549,7 @@ export default function StudentsPage() {
                                       <DropdownMenuItem
                                         className="cursor-pointer"
                                         onClick={() => {
+                                          setActiveMenuId(null)
                                           setEditStudent(student)
                                           setFormStatus(student.status || "Active")
                                           setIsDialogOpen(true)
