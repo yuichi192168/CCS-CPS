@@ -4,9 +4,18 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
+const CCS_LOGO_URL = "https://i.imgur.com/c2ywZT7.png"
+
 export const metadata: Metadata = {
   title: 'CCS Comprehensive Profiling System',
-  description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies.',
+  description: 'Centralized management for students, faculty, research, and events at the College of Computer Studies, Pamantasan ng Cabuyao.',
+  icons: {
+    icon: [
+      { url: CCS_LOGO_URL, type: 'image/png' },
+    ],
+    shortcut: CCS_LOGO_URL,
+    apple: CCS_LOGO_URL,
+  },
 };
 
 export default function RootLayout({

@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Mail, Search, Loader2, Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { useCollection, useFirestore, useUser } from "@/firebase"
+import { useCollection, useFirestore } from "@/firebase"
+import { useUserProfile } from "@/firebase/auth/use-user-profile"
 import { collection, query, orderBy, addDoc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -18,9 +19,11 @@ import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
+
 export default function FacultyPage() {
   const db = useFirestore()
-  const { user } = useUser()
+  const { user } = useUserProfile()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -40,7 +43,7 @@ export default function FacultyPage() {
       specialization: formData.get("specialization") as string,
       publications: 0,
       email: formData.get("email") as string,
-      image: `https://picsum.photos/seed/${formData.get("name")}/200`,
+      image: "/images/suit-faculty.png",
     }
 
     const facultyRef = collection(db, "faculty")
@@ -130,7 +133,8 @@ export default function FacultyPage() {
                     <div className="h-24 bg-primary group-hover:bg-primary/90 transition-colors" />
                     <CardContent className="relative flex flex-col items-center p-6 pt-0">
                       <Avatar className="h-20 w-20 -mt-10 border-4 border-background ring-2 ring-primary/5 shadow-md">
-                        <AvatarImage src={member.image} />
+                        <AvatarImage src={member.image} alt={member.name} />
+                        <AvatarImage src={CCS_LOGO} alt="Fallback" />
                         <AvatarFallback>{member.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="mt-4 text-center">

@@ -18,6 +18,8 @@ import { Loader2, Save, User, Mail, Shield } from "lucide-react"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
+const PNC_LOGO = "https://i.imgur.com/5aAzmh5.png"
+
 export default function ProfilePage() {
   const { profile, loading: profileLoading } = useUserProfile()
   const db = useFirestore()
@@ -62,6 +64,9 @@ export default function ProfilePage() {
     )
   }
 
+  // Determine professional suit profile image based on role
+  const profileImage = `/images/suit-${profile?.role || 'student'}.png`
+
   return (
     <>
       <AppSidebar />
@@ -77,7 +82,8 @@ export default function ProfilePage() {
             <Card className="border-none shadow-sm ring-1 ring-border">
               <CardHeader className="flex flex-row items-center gap-6 pb-6 border-b">
                 <Avatar className="h-20 w-20 border-4 border-background ring-2 ring-primary/10">
-                  <AvatarImage src={profile?.photoURL || `https://picsum.photos/seed/${profile?.uid}/200`} />
+                  <AvatarImage src={profileImage} alt="Profile" />
+                  <AvatarImage src={PNC_LOGO} alt="Fallback" />
                   <AvatarFallback>{profile?.displayName?.[0] || "U"}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-1">
@@ -108,7 +114,7 @@ export default function ProfilePage() {
                       </Label>
                       <Input 
                         id="email" 
-                        value={profile?.email} 
+                        value={profile?.email || ""} 
                         disabled 
                         className="bg-muted/50"
                       />

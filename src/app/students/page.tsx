@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -12,9 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Filter, Plus, MoreHorizontal, Loader2, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useCollection, useFirestore, useUser } from "@/firebase"
+import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
-import { collection, query, orderBy, addDoc, deleteDoc, doc } from "firebase/firestore"
+import { collection, query, orderBy, setDoc, deleteDoc, doc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -23,6 +22,8 @@ import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
+
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function StudentsPage() {
         const [editStudent, setEditStudent] = useState<any | null>(null)
@@ -59,14 +60,22 @@ export default function StudentsPage() {
   const handleAddOrEditStudent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
+<<<<<<< HEAD
     const studentData = {
       id: formData.get("studentId") as string,
+=======
+    const studentId = formData.get("studentId") as string
+    
+    const newStudent = {
+      id: studentId,
+>>>>>>> 5c3091ad215c99085b9216e864514a4001431f71
       name: formData.get("name") as string,
       course: formData.get("course") as string,
       year: formData.get("year") as string,
       academicYear: formData.get("academicYear") as string,
       status: formData.get("status") as string,
       email: formData.get("email") as string,
+<<<<<<< HEAD
       imageUrl: `https://picsum.photos/seed/${formData.get("studentId")}/200`,
       academicHistory: formData.get("academicHistory") as string,
       activities: formData.get("activities") as string,
@@ -100,6 +109,22 @@ export default function StudentsPage() {
         .then(() => {
           setIsDialogOpen(false)
           toast({ title: "Success", description: "Student enrolled successfully." })
+=======
+      imageUrl: "/images/suit-student.png"
+    }
+
+    const studentRef = doc(db, "students", studentId)
+    setDoc(studentRef, newStudent)
+      .then(() => {
+        setIsDialogOpen(false)
+        toast({ title: "Success", description: "Student enrolled successfully." })
+      })
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: studentRef.path,
+          operation: "create",
+          requestResourceData: newStudent,
+>>>>>>> 5c3091ad215c99085b9216e864514a4001431f71
         })
         .catch(async (serverError) => {
           const permissionError = new FirestorePermissionError({
@@ -350,8 +375,14 @@ export default function StudentsPage() {
                         <Card key={student.id} className="border shadow-sm">
                           <CardHeader>
                             <div className="flex items-center gap-3">
+<<<<<<< HEAD
                               <Avatar className="h-12 w-12 ring-1 ring-border">
                                 <AvatarImage src={student.imageUrl} />
+=======
+                              <Avatar className="h-9 w-9 ring-1 ring-border">
+                                <AvatarImage src={student.imageUrl} alt={student.name} />
+                                <AvatarImage src={CCS_LOGO} alt="Fallback" />
+>>>>>>> 5c3091ad215c99085b9216e864514a4001431f71
                                 <AvatarFallback>{student.name[0]}</AvatarFallback>
                               </Avatar>
                               <div>
