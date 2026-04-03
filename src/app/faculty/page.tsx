@@ -18,11 +18,13 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
+import { useRouter } from "next/navigation"
 
 const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function FacultyPage() {
   const db = useFirestore()
+  const router = useRouter()
   const { user } = useUserProfile()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -153,7 +155,13 @@ export default function FacultyPage() {
                             Email
                           </a>
                         </Button>
-                        <Button size="sm" className="flex-1">View Profile</Button>
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => router.push(`/faculty/profile?id=${member.docId || member.id}`)}
+                        >
+                          View Profile
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
