@@ -8,11 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Mail, Search, Loader2, Plus } from "lucide-react"
+import { Mail, Search, Loader2, Plus, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
-import { collection, query, orderBy, addDoc } from "firebase/firestore"
+import { collection, query, orderBy, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
@@ -25,9 +25,10 @@ const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 export default function FacultyPage() {
   const db = useFirestore()
   const router = useRouter()
-  const { user } = useUserProfile()
+  const { user, profile } = useUserProfile()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editFaculty, setEditFaculty] = useState<any | null>(null)
 
   const facultyQuery = useMemo(() => {
     if (!db) return null
@@ -39,26 +40,63 @@ export default function FacultyPage() {
   const handleAddFaculty = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    const newFaculty = {
+    const facultyData = {
       name: formData.get("name") as string,
       role: formData.get("role") as string,
       specialization: formData.get("specialization") as string,
-      publications: 0,
+      publications: editFaculty?.publications || 0,
       email: formData.get("email") as string,
       image: CCS_LOGO,
     }
 
+    if (editFaculty) {
+      const facultyDocRef = doc(db, "faculty", editFaculty.docId || editFaculty.id)
+      setDoc(facultyDocRef, facultyData, { merge: true })
+        .then(() => {
+          setIsDialogOpen(false)
+          setEditFaculty(null)
+          toast({ title: "Success", description: "Faculty member updated." })
+        })
+        .catch(async () => {
+          const permissionError = new FirestorePermissionError({
+            path: facultyDocRef.path,
+            operation: "update",
+            requestResourceData: facultyData,
+          })
+          errorEmitter.emit("permission-error", permissionError)
+        })
+      return
+    }
+
     const facultyRef = collection(db, "faculty")
-    addDoc(facultyRef, newFaculty)
+    addDoc(facultyRef, facultyData)
       .then(() => {
         setIsDialogOpen(false)
+        setEditFaculty(null)
         toast({ title: "Success", description: "Faculty member added." })
       })
-      .catch(async (serverError) => {
+      .catch(async () => {
         const permissionError = new FirestorePermissionError({
           path: facultyRef.path,
           operation: "create",
-          requestResourceData: newFaculty,
+          requestResourceData: facultyData,
+        })
+        errorEmitter.emit("permission-error", permissionError)
+      })
+  }
+
+  const handleDeleteFaculty = (facultyId: string) => {
+    if (!db) return
+    const facultyRef = doc(db, "faculty", facultyId)
+
+    deleteDoc(facultyRef)
+      .then(() => {
+        toast({ title: "Deleted", description: "Faculty member has been removed." })
+      })
+      .catch(async () => {
+        const permissionError = new FirestorePermissionError({
+          path: facultyRef.path,
+          operation: "delete",
         })
         errorEmitter.emit("permission-error", permissionError)
       })
@@ -81,9 +119,19 @@ export default function FacultyPage() {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input placeholder="Search faculty..." className="pl-9" />
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog
+                  open={isDialogOpen}
+                  onOpenChange={(open) => {
+                    setIsDialogOpen(open)
+                    if (!open) setEditFaculty(null)
+                  }}
+                >
                   <DialogTrigger asChild>
-                    <Button className="gap-2" disabled={!user}>
+                    <Button
+                      className="gap-2"
+                      disabled={!user}
+                      onClick={() => setEditFaculty(null)}
+                    >
                       <Plus className="h-4 w-4" />
                       Add Faculty
                     </Button>
@@ -91,28 +139,28 @@ export default function FacultyPage() {
                   <DialogContent className="sm:max-w-xl">
                     <form onSubmit={handleAddFaculty}>
                       <DialogHeader>
-                        <DialogTitle>Add Faculty Member</DialogTitle>
+                        <DialogTitle>{editFaculty ? "Edit Faculty Member" : "Add Faculty Member"}</DialogTitle>
                       </DialogHeader>
                       <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-1">
                         <div className="grid gap-2">
                           <Label htmlFor="name">Full Name</Label>
-                          <Input id="name" name="name" placeholder="Dr. Alan Turing" required />
+                          <Input id="name" name="name" placeholder="Dr. Alan Turing" required defaultValue={editFaculty?.name || ""} />
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="email">Email</Label>
-                          <Input id="email" name="email" type="email" placeholder="alan.turing@pnc.edu.ph" required />
+                          <Input id="email" name="email" type="email" placeholder="alan.turing@pnc.edu.ph" required defaultValue={editFaculty?.email || ""} />
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="role">Role / Rank</Label>
-                          <Input id="role" name="role" placeholder="Associate Professor" required />
+                          <Input id="role" name="role" placeholder="Associate Professor" required defaultValue={editFaculty?.role || ""} />
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="specialization">Specialization</Label>
-                          <Input id="specialization" name="specialization" placeholder="Computer Science, AI" required />
+                          <Input id="specialization" name="specialization" placeholder="Computer Science, AI" required defaultValue={editFaculty?.specialization || ""} />
                         </div>
                       </div>
                       <DialogFooter>
-                        <Button type="submit">Add Member</Button>
+                        <Button type="submit">{editFaculty ? "Update Member" : "Add Member"}</Button>
                       </DialogFooter>
                     </form>
                   </DialogContent>
@@ -154,6 +202,30 @@ export default function FacultyPage() {
                             Email
                           </a>
                         </Button>
+                        {(profile?.role === "admin") && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              setEditFaculty(member)
+                              setIsDialogOpen(true)
+                            }}
+                          >
+                            Edit Info
+                          </Button>
+                        )}
+                        {(profile?.role === "admin") && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="flex-1 gap-1"
+                            onClick={() => handleDeleteFaculty(member.docId || member.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           className="flex-1"
