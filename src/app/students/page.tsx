@@ -8,12 +8,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Filter, Plus, MoreHorizontal, Trash2 } from "lucide-react"
+import { Search, Filter, Plus, MoreHorizontal, Trash2, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
-import { collection, query, orderBy, setDoc, deleteDoc, doc } from "firebase/firestore"
+import { collection, query, orderBy, setDoc, deleteDoc, doc, writeBatch } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -36,6 +36,7 @@ export default function StudentsPage() {
   const { profile } = useUserProfile()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isSeeding, setIsSeeding] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [skillFilter, setSkillFilter] = useState<string | null>(null)
   
@@ -149,6 +150,129 @@ export default function StudentsPage() {
       })
   }
 
+  const handleSeedSampleData = async () => {
+    if (!db) {
+      toast({ title: "Database unavailable", description: "Firestore is not initialized.", variant: "destructive" })
+      return
+    }
+
+    setIsSeeding(true)
+
+    const biniMembers = [
+      "Aiah",
+      "Colet",
+      "Maloi",
+      "Gwen",
+      "Stacey",
+      "Mikha",
+      "Jhoanna",
+      "Sheena",
+    ]
+
+    const sampleStudents = biniMembers.map((name, i) => ({
+      id: `22033${(i + 1).toString().padStart(2, "0")}`,
+      name: `${name} Salamin`,
+      course: i % 2 === 0 ? "BSCS" : "BSIT",
+      year: `${(i % 4) + 1} Year`,
+      academicYear: "2025-2026",
+      status: "Active",
+      email: `${name.toLowerCase()}@pnc.edu.ph`,
+      imageUrl: CCS_LOGO,
+      academicHistory: "Senior High School - STEM track, with strong academic standing.",
+      activities: i % 2 === 0 ? "Coding Club, Dance Troupe" : "Student Council, Debate Society",
+      violations: "None",
+      skills: i % 2 === 0 ? ["programming", "design"] : ["basketball", "communication"],
+      affiliations: i % 2 === 0 ? ["CCS Tech Guild", "Campus Creatives"] : ["Intramurals Team", "Peer Mentors"],
+    }))
+
+    const sampleFaculty = biniMembers.slice(0, 6).map((name, i) => ({
+      name: `Prof. ${name} Ramos`,
+      role: i % 2 === 0 ? "Associate Professor" : "Assistant Professor",
+      specialization: i % 2 === 0 ? "Software Engineering" : "Data Science",
+      publications: 2 + i,
+      email: `${name.toLowerCase()}.faculty@pnc.edu.ph`,
+      image: "/images/suit-faculty.png",
+    }))
+
+    const currentYear = new Date().getFullYear()
+    const sampleResearch = [
+      {
+        title: "BINI: Student-Centered UX Patterns for Campus Portals",
+        authors: "Aiah, Colet, Maloi",
+        year: String(currentYear),
+        tags: ["UX", "Education", "Frontend"],
+        citation: 3,
+        abstract: "A study on usability and accessibility improvements for college information systems.",
+      },
+      {
+        title: "Predictive Analytics for Student Success Using BINI Cohort Data",
+        authors: "Mikha, Jhoanna, Stacey",
+        year: String(currentYear - 1),
+        tags: ["Analytics", "Machine Learning", "Academic Performance"],
+        citation: 6,
+        abstract: "This paper explores early-warning indicators for academic risk using school data.",
+      },
+      {
+        title: "Event Recommendation Engine for Campus Activities",
+        authors: "Gwen, Sheena",
+        year: String(currentYear),
+        tags: ["Recommender Systems", "Student Engagement"],
+        citation: 2,
+        abstract: "A lightweight recommendation model to increase student participation in co-curricular events.",
+      },
+    ]
+
+    const sampleEvents = [
+      { title: "BINI Tech Orientation 2026", date: "2026-06-10", time: "09:00 AM", location: "CCS Auditorium", type: "Academic" },
+      { title: "BINI Code Jam", date: "2026-07-05", time: "01:00 PM", location: "Computer Lab 2", type: "Competition" },
+      { title: "BINI Research Colloquium", date: "2026-08-14", time: "10:00 AM", location: "Innovation Hub", type: "Workshop" },
+      { title: "BINI Sports and Wellness Day", date: "2026-09-03", time: "08:00 AM", location: "University Gym", type: "Administrative" },
+    ]
+
+    try {
+      const batch = writeBatch(db)
+
+      sampleStudents.forEach((student) => {
+        const studentRef = doc(db, "students", student.id)
+        batch.set(studentRef, student, { merge: true })
+      })
+
+      sampleFaculty.forEach((faculty, i) => {
+        const facultyRef = doc(db, "faculty", `bini-faculty-${i + 1}`)
+        batch.set(facultyRef, faculty, { merge: true })
+      })
+
+      sampleResearch.forEach((paper, i) => {
+        const paperRef = doc(db, "research", `bini-research-${i + 1}`)
+        batch.set(paperRef, paper, { merge: true })
+      })
+
+      sampleEvents.forEach((event, i) => {
+        const eventRef = doc(db, "events", `bini-event-${i + 1}`)
+        batch.set(eventRef, event, { merge: true })
+      })
+
+      await batch.commit()
+      toast({
+        title: "Sample data added",
+        description: "Students, faculty, research papers, and events were populated successfully.",
+      })
+    } catch (serverError) {
+      const permissionError = new FirestorePermissionError({
+        path: "students|faculty|research|events",
+        operation: "write",
+      })
+      errorEmitter.emit("permission-error", permissionError)
+      toast({
+        title: "Seeding failed",
+        description: "Could not add sample records. Check your permissions.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSeeding(false)
+    }
+  }
+
   return (
     <>
       <AppSidebar />
@@ -173,18 +297,31 @@ export default function StudentsPage() {
                     }
                   }}
                 >
-                  <DialogTrigger asChild>
-                    <Button
+                  <div className="flex flex-wrap gap-2">
+                    {/* <Button
+                      type="button"
+                      variant="outline"
                       className="w-full sm:w-auto gap-2"
-                      onClick={() => {
-                        setEditStudent(null)
-                        setFormStatus("Active")
-                      }}
+                      onClick={handleSeedSampleData}
+                      disabled={isSeeding}
                     >
-                      <Plus className="h-4 w-4" />
-                      Enroll New Student
-                    </Button>
-                  </DialogTrigger>
+                      {isSeeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Filter className="h-4 w-4" />}
+                      Add BINI Sample Data
+                    </Button> */}
+
+                    <DialogTrigger asChild>
+                      <Button
+                        className="w-full sm:w-auto gap-2"
+                        onClick={() => {
+                          setEditStudent(null)
+                          setFormStatus("Active")
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                        Enroll New Student
+                      </Button>
+                    </DialogTrigger>
+                  </div>
                   <DialogContent className="sm:max-w-2xl">
                     <form onSubmit={handleAddOrEditStudent}>
                       <DialogHeader>
@@ -197,11 +334,11 @@ export default function StudentsPage() {
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="name">Full Name</Label>
-                          <Input id="name" name="name" placeholder="Juan Dela Cruz" required defaultValue={editStudent?.name || ""} />
+                          <Input id="name" name="name" placeholder="Mikha Lim" required defaultValue={editStudent?.name || ""} />
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="email">Email Address</Label>
-                          <Input id="email" name="email" type="email" placeholder="juan@pnc.edu.ph" required defaultValue={editStudent?.email || ""} />
+                          <Input id="email" name="email" type="email" placeholder="mikha@pnc.edu.ph" required defaultValue={editStudent?.email || ""} />
                         </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div className="grid gap-2">
@@ -231,7 +368,7 @@ export default function StudentsPage() {
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="skills">Skills</Label>
-                          <Input id="skills" name="skills" placeholder="e.g. programming, basketball, design (comma separated)" defaultValue={Array.isArray(editStudent?.skills) ? editStudent.skills.join(", ") : (editStudent?.skills || "")} />
+                          <Input id="skills" name="skills" placeholder="programming, basketball, design (comma separated)" defaultValue={Array.isArray(editStudent?.skills) ? editStudent.skills.join(", ") : (editStudent?.skills || "")} />
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="affiliations">Affiliations</Label>

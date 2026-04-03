@@ -257,7 +257,7 @@ export function AppHeader() {
                       <form onSubmit={handleSignUp} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="signup-name">Full Name</Label>
-                          <Input id="signup-name" placeholder="Juan Dela Cruz" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                          <Input id="signup-name" placeholder="Mikha Lim" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="signup-email">Email</Label>
