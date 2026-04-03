@@ -132,8 +132,8 @@ export default function EventsPage() {
                   <CardTitle className="text-lg">Event Calendar</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex justify-center border rounded-md p-2 bg-muted/10">
-                    <CalendarUI mode="single" className="w-full" />
+                  <div className="w-full overflow-x-auto rounded-md border bg-muted/10 p-2">
+                    <CalendarUI mode="single" className="mx-auto w-full max-w-[22rem]" />
                   </div>
                 </CardContent>
               </Card>
