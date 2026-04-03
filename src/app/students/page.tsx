@@ -140,7 +140,7 @@ export default function StudentsPage() {
                       <DialogHeader>
                         <DialogTitle>{editStudent ? "Edit Student" : "Enroll Student"}</DialogTitle>
                       </DialogHeader>
-                      <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4 pr-1">
+                      <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
                           <Label htmlFor="studentId">Student ID</Label>
                           <Input id="studentId" name="studentId" placeholder="2024-0001" required defaultValue={editStudent?.id || ""} disabled={!!editStudent} />
