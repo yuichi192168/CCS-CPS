@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Filter, Plus, MoreHorizontal, Loader2, Trash2 } from "lucide-react"
+import { Search, Filter, Plus, MoreHorizontal, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCollection, useFirestore } from "@/firebase"
@@ -22,6 +22,8 @@ import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
@@ -288,8 +290,50 @@ export default function StudentsPage() {
               </CardHeader>
               <CardContent className="p-0">
                 {loading ? (
-                  <div className="flex h-32 items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <div className="space-y-4 p-4">
+                    <div className="flex items-center gap-3 rounded-lg border bg-muted/20 p-3">
+                      <Image
+                        src={CCS_LOGO}
+                        alt="CCS logo"
+                        width={32}
+                        height={32}
+                        className="animate-pulse rounded-md"
+                        unoptimized
+                      />
+                      <span className="text-sm font-medium text-muted-foreground">Loading students...</span>
+                    </div>
+
+                    {viewMode === 'table' ? (
+                      <div className="space-y-2">
+                        <Skeleton className="h-10 w-full" />
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <Skeleton key={i} className="h-12 w-full" />
+                        ))}
+                      </div>
+                    ) : viewMode === 'card' ? (
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <div key={i} className="space-y-3 rounded-lg border p-4">
+                            <div className="flex items-center gap-3">
+                              <Skeleton className="h-10 w-10 rounded-full" />
+                              <div className="space-y-2">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-3 w-32" />
+                              </div>
+                            </div>
+                            <Skeleton className="h-3 w-full" />
+                            <Skeleton className="h-3 w-2/3" />
+                            <Skeleton className="h-8 w-full" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {Array.from({ length: 7 }).map((_, i) => (
+                          <Skeleton key={i} className="h-16 w-full" />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : error ? (
                   <div className="p-8 text-center text-destructive">
