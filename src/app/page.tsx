@@ -6,7 +6,7 @@ import { AppHeader } from "@/components/layout/app-header"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { GraduationCap, Users, Library, Calendar, TrendingUp, BookOpen, UserCircle, History, Award, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react"
+import { GraduationCap, Users, Library, Calendar, TrendingUp, UserCircle, History, Award, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { useUserProfile } from "@/firebase/auth/use-user-profile"
 import { collection } from "firebase/firestore"
@@ -50,7 +50,7 @@ export default function Dashboard() {
 
   const facultyActions = [
     { title: "Faculty Portal", desc: "Manage your professional profile", icon: UserCircle, url: "/profile" },
-    { title: "Syllabus Tools", desc: "Generate instructional outlines", icon: BookOpen, url: "/tools/syllabus" },
+    { title: "Research Summarizer", desc: "Summarize research content with AI", icon: Library, url: "/tools/summarizer" },
     { title: "Submit Research", desc: "Add new publications to the repository", icon: Library, url: "/research" },
   ]
 

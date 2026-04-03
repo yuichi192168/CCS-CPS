@@ -71,12 +71,11 @@ const navItems = [
     roles: ["admin", "faculty", "student"],
   },
   {
-    title: "Instructional Tools",
+    title: "AI Tools",
     url: "/tools",
     icon: Wand2,
     roles: ["admin", "faculty"],
     children: [
-      { title: "Syllabus Generator", url: "/tools/syllabus" },
       { title: "Research Summarizer", url: "/tools/summarizer" },
     ],
   },

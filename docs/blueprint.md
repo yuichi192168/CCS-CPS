@@ -7,7 +7,6 @@
 - Faculty Profile Management: Create, view, and update detailed profiles for faculty members, showcasing their specializations, publications, and contact details.
 - Research Repository: Upload, browse, and search through a centralized repository of research papers, projects, and publications with detailed metadata.
 - Event & Schedule Management: Display and manage upcoming college events, academic calendars, and course schedules using a clean, filterable interface.
-- Instructional Material Content Tool: An AI-powered tool to assist faculty in generating structured outlines or descriptive text for syllabi and lesson plans based on input course objectives and topics.
 - Unified Search & Filtering: Global search functionality with advanced filtering options across all modules (students, faculty, events, research) to quickly find relevant information.
 
 ## Style Guidelines:
