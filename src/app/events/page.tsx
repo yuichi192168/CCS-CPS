@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Calendar as CalendarUI } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Clock, MapPin, Plus, Calendar as CalendarIcon, Filter, Loader2 } from "lucide-react"
+import { Clock, MapPin, Plus, Filter, Loader2 } from "lucide-react"
 import { useCollection, useFirestore, useUser } from "@/firebase"
 import { collection, query, orderBy, addDoc } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
@@ -24,6 +24,12 @@ export default function EventsPage() {
   const { user } = useUser()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [eventType, setEventType] = useState("Academic")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null)
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   const eventsQuery = useMemo(() => {
     if (!db) return null
@@ -32,21 +38,54 @@ export default function EventsPage() {
 
   const { data: events, loading, error } = useCollection(eventsQuery)
 
+  const availableTypes = useMemo(() => {
+    const types = (events || []).map((e: any) => e.type).filter(Boolean)
+    return Array.from(new Set(types))
+  }, [events])
+
+  const filteredEvents = useMemo(() => {
+    if (!events) return []
+
+    const queryText = searchTerm.toLowerCase().trim()
+
+    return events.filter((event: any) => {
+      const title = (event.title || "").toLowerCase()
+      const location = (event.location || "").toLowerCase()
+      const type = (event.type || "").toLowerCase()
+      const time = (event.time || "").toLowerCase()
+
+      const matchesSearch = !queryText || title.includes(queryText) || location.includes(queryText) || type.includes(queryText) || time.includes(queryText)
+      const matchesType = typeFilter === "all" || event.type === typeFilter
+
+      const eventDateString = String(event.date || "")
+      const selectedDateString = selectedDate ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}` : ""
+      const matchesDate = !selectedDate || eventDateString === selectedDateString
+
+      return matchesSearch && matchesType && matchesDate
+    })
+  }, [events, searchTerm, typeFilter, selectedDate])
+
   const handleAddEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!eventType) {
+      toast({ title: "Event type required", description: "Please select an event type.", variant: "destructive" })
+      return
+    }
+
     const formData = new FormData(e.currentTarget)
     const newEvent = {
       title: formData.get("title") as string,
       date: formData.get("date") as string,
       time: formData.get("time") as string,
       location: formData.get("location") as string,
-      type: formData.get("type") as string,
+      type: eventType,
     }
 
     const eventsRef = collection(db, "events")
     addDoc(eventsRef, newEvent)
       .then(() => {
         setIsDialogOpen(false)
+        setEventType("Academic")
         toast({ title: "Success", description: "Event scheduled successfully." })
       })
       .catch(async (serverError) => {
@@ -57,6 +96,11 @@ export default function EventsPage() {
         })
         errorEmitter.emit("permission-error", permissionError)
       })
+  }
+
+  const openDetails = (event: any) => {
+    setSelectedEvent(event)
+    setIsDetailsOpen(true)
   }
 
   return (
@@ -72,7 +116,13 @@ export default function EventsPage() {
                 <p className="text-muted-foreground">View and manage college events and schedules.</p>
               </div>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog
+                open={isDialogOpen}
+                onOpenChange={(open) => {
+                  setIsDialogOpen(open)
+                  if (!open) setEventType("Academic")
+                }}
+              >
                 <DialogTrigger asChild>
                   <Button className="gap-2" disabled={!user}>
                     <Plus className="h-4 w-4" />
@@ -105,7 +155,7 @@ export default function EventsPage() {
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="type">Event Type</Label>
-                        <Select name="type" required>
+                        <Select value={eventType} onValueChange={setEventType}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
@@ -133,7 +183,12 @@ export default function EventsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="w-full overflow-x-auto rounded-md border bg-muted/10 p-2">
-                    <CalendarUI mode="single" className="mx-auto w-full max-w-[22rem]" />
+                    <CalendarUI
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      className="mx-auto w-full max-w-[22rem]"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -144,12 +199,41 @@ export default function EventsPage() {
                     <CardTitle className="text-lg">Upcoming Events</CardTitle>
                     <CardDescription>Scheduled activities for the next 30 days.</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Filter className="h-3 w-3" />
-                    Filter
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Select value={typeFilter} onValueChange={setTypeFilter}>
+                      <SelectTrigger className="h-8 min-w-[140px]">
+                        <SelectValue placeholder="Filter by type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        {availableTypes.map((type) => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => {
+                        setSearchTerm("")
+                        setTypeFilter("all")
+                        setSelectedDate(undefined)
+                      }}
+                    >
+                      <Filter className="h-3 w-3" />
+                      Clear
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
+                  <div className="border-t p-4">
+                    <Input
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search events by title, location, type, or time..."
+                    />
+                  </div>
                   <div className="divide-y border-t">
                     {loading ? (
                       <div className="flex h-32 items-center justify-center">
@@ -158,10 +242,11 @@ export default function EventsPage() {
                     ) : error ? (
                       <div className="p-8 text-center text-destructive">Failed to load events.</div>
                     ) : (
-                      events?.map((event: any, i) => {
-                        const eventDate = new Date(event.date);
-                        const month = eventDate.toLocaleString('default', { month: 'short' }).toUpperCase();
-                        const day = eventDate.getDate();
+                      filteredEvents.map((event: any) => {
+                        const eventDate = new Date(event.date)
+                        const isValidDate = !Number.isNaN(eventDate.getTime())
+                        const month = isValidDate ? eventDate.toLocaleString("default", { month: "short" }).toUpperCase() : "TBD"
+                        const day = isValidDate ? eventDate.getDate() : "-"
                         
                         return (
                           <div key={event.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
@@ -179,18 +264,35 @@ export default function EventsPage() {
                                 <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {event.location}</span>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">Details</Button>
+                            <Button variant="outline" size="sm" onClick={() => openDetails(event)}>Details</Button>
                           </div>
                         )
                       })
                     )}
-                    {(!loading && (!events || events.length === 0)) && (
-                      <div className="p-8 text-center text-muted-foreground italic">No events scheduled.</div>
+                    {(!loading && filteredEvents.length === 0) && (
+                      <div className="p-8 text-center text-muted-foreground italic">No events scheduled for the selected filters.</div>
                     )}
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>{selectedEvent?.title || "Event Details"}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 text-sm">
+                  <p><span className="font-semibold">Date:</span> {selectedEvent?.date || "N/A"}</p>
+                  <p><span className="font-semibold">Time:</span> {selectedEvent?.time || "N/A"}</p>
+                  <p><span className="font-semibold">Location:</span> {selectedEvent?.location || "N/A"}</p>
+                  <p><span className="font-semibold">Type:</span> {selectedEvent?.type || "N/A"}</p>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>Close</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </main>
       </SidebarInset>
