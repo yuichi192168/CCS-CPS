@@ -9,7 +9,6 @@ import {
   Library,
   Settings,
   Users,
-  Wand2,
   UserCircle,
 } from "lucide-react"
 import Image from "next/image"
@@ -69,15 +68,6 @@ const navItems = [
     url: "/events",
     icon: Calendar,
     roles: ["admin", "faculty", "student"],
-  },
-  {
-    title: "AI Tools",
-    url: "/tools",
-    icon: Wand2,
-    roles: ["admin", "faculty"],
-    children: [
-      { title: "Research Summarizer", url: "/tools/summarizer" },
-    ],
   },
 ]
 

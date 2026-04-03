@@ -50,7 +50,6 @@ export default function Dashboard() {
 
   const facultyActions = [
     { title: "Faculty Portal", desc: "Manage your professional profile", icon: UserCircle, url: "/profile" },
-    { title: "Research Summarizer", desc: "Summarize research content with AI", icon: Library, url: "/tools/summarizer" },
     { title: "Submit Research", desc: "Add new publications to the repository", icon: Library, url: "/research" },
   ]
 
