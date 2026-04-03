@@ -5,72 +5,81 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function StudentProfile({ student }: { student: any }) {
   if (!student) return <div>No student found.</div>;
   return (
-    <Card className="max-w-2xl mx-auto mt-8">
-      <CardHeader>
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16 ring-2 ring-primary">
-            <AvatarImage src={student.imageUrl} />
-            <AvatarFallback>{student.name?.[0]}</AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-2xl font-bold">{student.name}</CardTitle>
-            <div className="text-sm text-muted-foreground">{student.email}</div>
-            <div className="text-xs mt-1">ID: {student.id}</div>
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Avatar className="h-16 w-16 ring-2 ring-primary">
+              <AvatarImage src={student.imageUrl} />
+              <AvatarFallback>{student.name?.[0]}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <CardTitle className="break-words text-xl font-bold sm:text-2xl">{student.name}</CardTitle>
+              <div className="break-all text-sm text-muted-foreground">{student.email}</div>
+              <div className="mt-1 text-xs">ID: {student.id}</div>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <div className="font-semibold">Course / Strand</div>
-            <div>{student.course}</div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-lg border bg-muted/20 p-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Course / Strand</div>
+              <div className="mt-1 break-words text-sm">{student.course || "-"}</div>
+            </div>
+            <div className="rounded-lg border bg-muted/20 p-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Year Level</div>
+              <div className="mt-1 break-words text-sm">{student.year || "-"}</div>
+            </div>
+            <div className="rounded-lg border bg-muted/20 p-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Academic Year</div>
+              <div className="mt-1 break-words text-sm">{student.academicYear || "-"}</div>
+            </div>
+            <div className="rounded-lg border bg-muted/20 p-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</div>
+              <div className="mt-1">
+                <Badge>{student.status || "-"}</Badge>
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="font-semibold">Year Level</div>
-            <div>{student.year}</div>
+
+          <div className="space-y-1">
+            <div className="font-semibold">Academic History</div>
+            <div className="rounded-lg border p-3 text-sm text-muted-foreground">{student.academicHistory || "-"}</div>
           </div>
-          <div>
-            <div className="font-semibold">Academic Year</div>
-            <div>{student.academicYear}</div>
+
+          <div className="space-y-1">
+            <div className="font-semibold">Non-Academic Activities</div>
+            <div className="rounded-lg border p-3 text-sm text-muted-foreground">{student.activities || "-"}</div>
           </div>
-          <div>
-            <div className="font-semibold">Status</div>
-            <Badge>{student.status}</Badge>
+
+          <div className="space-y-1">
+            <div className="font-semibold">Violations</div>
+            <div className="rounded-lg border p-3 text-sm text-muted-foreground">{student.violations || "-"}</div>
           </div>
-        </div>
-        <div>
-          <div className="font-semibold">Academic History</div>
-          <div className="text-sm text-muted-foreground">{student.academicHistory || "-"}</div>
-        </div>
-        <div>
-          <div className="font-semibold">Non-Academic Activities</div>
-          <div className="text-sm text-muted-foreground">{student.activities || "-"}</div>
-        </div>
-        <div>
-          <div className="font-semibold">Violations</div>
-          <div className="text-sm text-muted-foreground">{student.violations || "-"}</div>
-        </div>
-        <div>
-          <div className="font-semibold">Skills</div>
-          <div>
-            {Array.isArray(student.skills) && student.skills.length > 0
-              ? student.skills.map((skill: string, i: number) => (
-                  <Badge key={i} className="mr-1 mb-1 inline-block" variant="secondary">{skill}</Badge>
-                ))
-              : "-"}
+
+          <div className="space-y-1">
+            <div className="font-semibold">Skills</div>
+            <div className="rounded-lg border p-3">
+              {Array.isArray(student.skills) && student.skills.length > 0
+                ? student.skills.map((skill: string, i: number) => (
+                    <Badge key={i} className="mb-1 mr-1" variant="secondary">{skill}</Badge>
+                  ))
+                : <span className="text-sm text-muted-foreground">-</span>}
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="font-semibold">Affiliations</div>
-          <div>
-            {Array.isArray(student.affiliations) && student.affiliations.length > 0
-              ? student.affiliations.map((aff: string, i: number) => (
-                  <Badge key={i} className="mr-1 mb-1 inline-block" variant="outline">{aff}</Badge>
-                ))
-              : "-"}
+
+          <div className="space-y-1">
+            <div className="font-semibold">Affiliations</div>
+            <div className="rounded-lg border p-3">
+              {Array.isArray(student.affiliations) && student.affiliations.length > 0
+                ? student.affiliations.map((aff: string, i: number) => (
+                    <Badge key={i} className="mb-1 mr-1" variant="outline">{aff}</Badge>
+                  ))
+                : <span className="text-sm text-muted-foreground">-</span>}
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
