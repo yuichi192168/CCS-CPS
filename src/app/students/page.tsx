@@ -93,7 +93,7 @@ export default function StudentsPage() {
       academicYear: formData.get("academicYear") as string,
       status: formStatus,
       email: formData.get("email") as string,
-      imageUrl: `https://picsum.photos/seed/${formData.get("studentId")}/200`,
+      imageUrl: CCS_LOGO,
       academicHistory: formData.get("academicHistory") as string,
       activities: formData.get("activities") as string,
       violations: formData.get("violations") as string,
@@ -362,7 +362,7 @@ export default function StudentsPage() {
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 <Avatar className="h-9 w-9 ring-1 ring-border">
-                                  <AvatarImage src={student.imageUrl} />
+                                  <AvatarImage src={student.imageUrl || CCS_LOGO} />
                                   <AvatarFallback>{student.name[0]}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col">
@@ -480,7 +480,7 @@ export default function StudentsPage() {
                       {filteredStudents.map((student: any) => (
                         <li key={student.id} className="flex items-center gap-4 p-4 hover:bg-muted/10">
                           <Avatar className="h-10 w-10 ring-1 ring-border">
-                            <AvatarImage src={student.imageUrl} />
+                            <AvatarImage src={student.imageUrl || CCS_LOGO} />
                             <AvatarFallback>{student.name[0]}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1">

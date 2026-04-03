@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png";
+
 export default function StudentProfile({ student }: { student: any }) {
   if (!student) return <div>No student found.</div>;
   return (
@@ -11,7 +13,7 @@ export default function StudentProfile({ student }: { student: any }) {
           <CardHeader>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Avatar className="h-16 w-16 ring-2 ring-primary">
-                <AvatarImage src={student.imageUrl} />
+                <AvatarImage src={student.imageUrl || CCS_LOGO} />
                 <AvatarFallback>{student.name?.[0]}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
