@@ -1,10 +1,8 @@
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function StudentProfile({ student }: { student: any }) {
-  const router = useRouter();
   if (!student) return <div>No student found.</div>;
   return (
     <Card className="max-w-2xl mx-auto mt-8">
