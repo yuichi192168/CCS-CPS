@@ -26,9 +26,10 @@ import { useRouter } from "next/navigation"
 const CCS_LOGO = "https://i.imgur.com/c2ywZT7.png"
 
 export default function StudentsPage() {
-        const [editStudent, setEditStudent] = useState<any | null>(null)
-      const [viewMode, setViewMode] = useState<'table' | 'card' | 'list'>('table')
-    const router = useRouter();
+  const [editStudent, setEditStudent] = useState<any | null>(null)
+  const [viewMode, setViewMode] = useState<'table' | 'card' | 'list'>('table')
+  const [formStatus, setFormStatus] = useState("Active")
+  const router = useRouter()
   const db = useFirestore()
   const { profile } = useUserProfile()
   const { toast } = useToast()
@@ -59,8 +60,28 @@ export default function StudentsPage() {
 
   const handleAddOrEditStudent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!db) {
+      toast({ title: "Database unavailable", description: "Firestore is not initialized.", variant: "destructive" })
+      return
+    }
+
     const formData = new FormData(e.currentTarget)
-    const studentId = formData.get("studentId") as string
+    const rawStudentId = (formData.get("studentId") as string) || editStudent?.id || ""
+    const studentId = rawStudentId.trim()
+
+    if (!studentId) {
+      toast({ title: "Student ID is required", description: "Please enter a valid Student ID.", variant: "destructive" })
+      return
+    }
+
+    if (studentId.includes("/")) {
+      toast({
+        title: "Invalid Student ID",
+        description: "Student ID cannot contain '/'. Please use dashes instead.",
+        variant: "destructive",
+      })
+      return
+    }
 
     const studentData = {
       id: studentId,
@@ -68,7 +89,7 @@ export default function StudentsPage() {
       course: formData.get("course") as string,
       year: formData.get("year") as string,
       academicYear: formData.get("academicYear") as string,
-      status: formData.get("status") as string,
+      status: formStatus,
       email: formData.get("email") as string,
       imageUrl: `https://picsum.photos/seed/${formData.get("studentId")}/200`,
       academicHistory: formData.get("academicHistory") as string,
@@ -78,39 +99,51 @@ export default function StudentsPage() {
       affiliations: (formData.get("affiliations") as string).split(",").map(a => a.trim()).filter(Boolean),
     }
 
-    const targetId = editStudent?.id || studentId
+    const targetId = editStudent?.docId || studentId
     const studentRef = doc(db, "students", targetId)
     setDoc(studentRef, studentData, { merge: true })
       .then(() => {
         setIsDialogOpen(false)
         setEditStudent(null)
+        setFormStatus("Active")
         toast({
           title: "Success",
           description: editStudent ? "Student record updated." : "Student enrolled successfully.",
         })
       })
-      .catch(async (serverError) => {
+      .catch(async (serverError: any) => {
         const permissionError = new FirestorePermissionError({
           path: studentRef.path,
           operation: editStudent ? "update" : "create",
-            requestResourceData: studentData,
-          })
-          errorEmitter.emit("permission-error", permissionError)
+          requestResourceData: studentData,
+        })
+        errorEmitter.emit("permission-error", permissionError)
+        toast({
+          title: "Save failed",
+          description: serverError?.message || "Could not save student record.",
+          variant: "destructive",
+        })
       })
   }
 
   const handleDeleteStudent = (studentId: string) => {
+    if (!db) return
     const studentRef = doc(db, "students", studentId)
     deleteDoc(studentRef)
       .then(() => {
         toast({ title: "Deleted", description: "Student record has been removed." })
       })
-      .catch(async (error) => {
+      .catch(async (error: any) => {
         const permissionError = new FirestorePermissionError({
           path: studentRef.path,
           operation: "delete",
         })
         errorEmitter.emit("permission-error", permissionError)
+        toast({
+          title: "Delete failed",
+          description: error?.message || "Could not delete student record.",
+          variant: "destructive",
+        })
       })
   }
 
@@ -128,9 +161,24 @@ export default function StudentsPage() {
               </div>
 
               {isAdmin && (
-                <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setEditStudent(null); }}>
+                <Dialog
+                  open={isDialogOpen}
+                  onOpenChange={(open) => {
+                    setIsDialogOpen(open)
+                    if (!open) {
+                      setEditStudent(null)
+                      setFormStatus("Active")
+                    }
+                  }}
+                >
                   <DialogTrigger asChild>
-                    <Button className="w-full sm:w-auto gap-2" onClick={() => setEditStudent(null)}>
+                    <Button
+                      className="w-full sm:w-auto gap-2"
+                      onClick={() => {
+                        setEditStudent(null)
+                        setFormStatus("Active")
+                      }}
+                    >
                       <Plus className="h-4 w-4" />
                       Enroll New Student
                     </Button>
@@ -143,7 +191,7 @@ export default function StudentsPage() {
                       <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
                           <Label htmlFor="studentId">Student ID</Label>
-                          <Input id="studentId" name="studentId" placeholder="2024-0001" required defaultValue={editStudent?.id || ""} disabled={!!editStudent} />
+                          <Input id="studentId" name="studentId" placeholder="2026-0001" required defaultValue={editStudent?.id || ""} disabled={!!editStudent} />
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="name">Full Name</Label>
@@ -189,7 +237,10 @@ export default function StudentsPage() {
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="status">Status</Label>
-                          <Select name="status" defaultValue={editStudent?.status || "Active"}>
+                          <Select
+                            value={formStatus}
+                            onValueChange={setFormStatus}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
@@ -307,10 +358,19 @@ export default function StudentsPage() {
                                   </DropdownMenuItem>
                                   {isAdmin && (
                                     <>
-                                      <DropdownMenuItem className="cursor-pointer" onClick={() => { setEditStudent(student); setIsDialogOpen(true); }}>Edit Info</DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                          setEditStudent(student)
+                                          setFormStatus(student.status || "Active")
+                                          setIsDialogOpen(true)
+                                        }}
+                                      >
+                                        Edit Info
+                                      </DropdownMenuItem>
                                       <DropdownMenuItem 
                                         className="text-destructive cursor-pointer"
-                                        onClick={() => handleDeleteStudent(student.id)}
+                                        onClick={() => handleDeleteStudent(student.docId || student.id)}
                                       >
                                         <Trash2 className="mr-2 h-4 w-4" />
                                         Delete Record
