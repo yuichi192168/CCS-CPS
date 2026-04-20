@@ -55,6 +55,24 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Syllabus collection: Public read, Admin and Faculty write
+    match /syllabus/{syllabusId} {
+      allow read: if true;
+      allow write: if isAdmin() || isFaculty();
+    }
+
+    // Curriculum collection: Public read, Admin and Faculty write
+    match /curriculum/{curriculumId} {
+      allow read: if true;
+      allow write: if isAdmin() || isFaculty();
+    }
+
+    // Lessons collection: Public read, Admin and Faculty write
+    match /lessons/{lessonId} {
+      allow read: if true;
+      allow write: if isAdmin() || isFaculty();
+    }
     
     // Default deny
     match /{document=**} {

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  BookText,
   BookOpen,
   Calendar,
   GraduationCap,
@@ -67,6 +68,24 @@ const navItems = [
     title: "Events & Schedules",
     url: "/events",
     icon: Calendar,
+    roles: ["admin", "faculty", "student"],
+  },
+  {
+    title: "Syllabus",
+    url: "/syllabus",
+    icon: BookOpen,
+    roles: ["admin", "faculty", "student"],
+  },
+  {
+    title: "Curriculum",
+    url: "/curriculum",
+    icon: Library,
+    roles: ["admin", "faculty", "student"],
+  },
+  {
+    title: "Lessons",
+    url: "/lessons",
+    icon: BookText,
     roles: ["admin", "faculty", "student"],
   },
 ]

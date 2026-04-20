@@ -71,6 +71,47 @@
         "type": { "type": "string", "enum": ["Competition", "Academic", "Administrative", "Workshop"] }
       },
       "required": ["title", "date", "time", "location", "type"]
+    },
+    "Syllabus": {
+      "title": "Syllabus",
+      "description": "Course syllabus overview and metadata.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "description": { "type": "string" },
+        "ownerId": { "type": "string", "description": "UID of the creator." },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "courseCode"]
+    },
+    "Curriculum": {
+      "title": "Curriculum",
+      "description": "Program curriculum structure and requirements.",
+      "type": "object",
+      "properties": {
+        "program": { "type": "string" },
+        "academicYear": { "type": "string" },
+        "semester": { "type": "string" },
+        "courses": { "type": "array", "items": { "type": "string" } },
+        "ownerId": { "type": "string", "description": "UID of the creator." },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["program", "academicYear"]
+    },
+    "Lesson": {
+      "title": "Lesson",
+      "description": "Lesson plan or instructional content item.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "topic": { "type": "string" },
+        "content": { "type": "string" },
+        "ownerId": { "type": "string", "description": "UID of the creator." },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "courseCode"]
     }
   },
   "auth": {
@@ -96,6 +137,18 @@
     "/events/{eventId}": {
       "schema": { "$ref": "#/backend/entities/Event" },
       "description": "Academic calendar events."
+    },
+    "/syllabus/{syllabusId}": {
+      "schema": { "$ref": "#/backend/entities/Syllabus" },
+      "description": "Course syllabus documents."
+    },
+    "/curriculum/{curriculumId}": {
+      "schema": { "$ref": "#/backend/entities/Curriculum" },
+      "description": "Program curriculum records."
+    },
+    "/lessons/{lessonId}": {
+      "schema": { "$ref": "#/backend/entities/Lesson" },
+      "description": "Lesson plans and instructional content."
     }
   }
 }
