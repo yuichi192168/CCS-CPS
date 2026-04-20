@@ -10,20 +10,33 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Loader2, Plus, Search, BookText } from "lucide-react"
-import { useCollection, useFirestore, useUser } from "@/firebase"
-import { addDoc, collection, orderBy, query } from "firebase/firestore"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Loader2, Plus, Search, BookText, Pencil, Trash2 } from "lucide-react"
+import { useCollection, useFirestore, useUserProfile } from "@/firebase"
+import { addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
 export default function LessonsPage() {
   const db = useFirestore()
-  const { user } = useUser()
+  const { user, profile } = useUserProfile()
   const { toast } = useToast()
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedItem, setSelectedItem] = useState<any | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null)
 
   const lessonsQuery = useMemo(() => {
     if (!db) return null
@@ -31,6 +44,7 @@ export default function LessonsPage() {
   }, [db])
 
   const { data: lessonItems, loading, error } = useCollection(lessonsQuery)
+  const canManage = Boolean(user && (profile?.role === "admin" || profile?.role === "faculty"))
 
   const filteredItems = useMemo(() => {
     if (!lessonItems) return []
@@ -75,6 +89,65 @@ export default function LessonsPage() {
       })
   }
 
+  const handleOpenEdit = (item: any) => {
+    setSelectedItem(item)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleUpdateLesson = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!db || !selectedItem) return
+
+    const docId = selectedItem.docId || selectedItem.id
+    if (!docId) return
+
+    const formData = new FormData(e.currentTarget)
+    const updatedLesson = {
+      title: formData.get("title") as string,
+      courseCode: formData.get("courseCode") as string,
+      topic: formData.get("topic") as string,
+      content: formData.get("content") as string,
+      updatedAt: new Date().toISOString(),
+    }
+
+    const lessonDocRef = doc(db, "lessons", String(docId))
+    updateDoc(lessonDocRef, updatedLesson)
+      .then(() => {
+        setIsEditDialogOpen(false)
+        setSelectedItem(null)
+        toast({ title: "Updated", description: "Lesson entry updated successfully." })
+      })
+      .catch(() => {
+        const permissionError = new FirestorePermissionError({
+          path: lessonDocRef.path,
+          operation: "update",
+          requestResourceData: updatedLesson,
+        })
+        errorEmitter.emit("permission-error", permissionError)
+      })
+  }
+
+  const handleDeleteLesson = () => {
+    if (!db || !deleteTarget) return
+
+    const docId = deleteTarget.docId || deleteTarget.id
+    if (!docId) return
+
+    const lessonDocRef = doc(db, "lessons", String(docId))
+    deleteDoc(lessonDocRef)
+      .then(() => {
+        setDeleteTarget(null)
+        toast({ title: "Deleted", description: "Lesson entry deleted successfully." })
+      })
+      .catch(() => {
+        const permissionError = new FirestorePermissionError({
+          path: lessonDocRef.path,
+          operation: "delete",
+        })
+        errorEmitter.emit("permission-error", permissionError)
+      })
+  }
+
   return (
     <>
       <AppSidebar />
@@ -90,7 +163,7 @@ export default function LessonsPage() {
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="gap-2" disabled={!user}>
+                  <Button className="gap-2" disabled={!canManage}>
                     <Plus className="h-4 w-4" />
                     Add Lesson
                   </Button>
@@ -160,7 +233,24 @@ export default function LessonsPage() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <Badge variant="secondary">{item.courseCode || "N/A"}</Badge>
+                      <div className="flex items-center justify-between gap-3">
+                        <Badge variant="secondary">{item.courseCode || "N/A"}</Badge>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" onClick={() => handleOpenEdit(item)} disabled={!canManage}>
+                            <Pencil className="h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleteTarget(item)}
+                            disabled={!canManage}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">{item.content || "No content summary"}</p>
                     </CardContent>
                   </Card>
@@ -173,6 +263,76 @@ export default function LessonsPage() {
               </div>
             )}
           </div>
+
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="sm:max-w-xl">
+              <form onSubmit={handleUpdateLesson}>
+                <DialogHeader>
+                  <DialogTitle>Edit Lesson</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-title">Title</Label>
+                    <Input
+                      id="edit-title"
+                      name="title"
+                      placeholder="Lesson 1: Variables and Data Types"
+                      defaultValue={selectedItem?.title || ""}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-courseCode">Course Code</Label>
+                      <Input
+                        id="edit-courseCode"
+                        name="courseCode"
+                        placeholder="CS101"
+                        defaultValue={selectedItem?.courseCode || ""}
+                        required
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-topic">Topic</Label>
+                      <Input
+                        id="edit-topic"
+                        name="topic"
+                        placeholder="Python Basics"
+                        defaultValue={selectedItem?.topic || ""}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-content">Content Summary</Label>
+                    <Input
+                      id="edit-content"
+                      name="content"
+                      placeholder="Learning goals, activities, and assessments"
+                      defaultValue={selectedItem?.content || ""}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit">Update</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete lesson entry?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently remove the selected lesson record.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteLesson}>Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </main>
       </SidebarInset>
     </>
