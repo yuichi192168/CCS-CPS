@@ -1,6 +1,8 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
 import { useCollection } from "@/firebase";
-import StudentProfile from "./profile";
+import StudentProfile from "../profile";
 
 export default function StudentProfilePage() {
   const searchParams = useSearchParams();
