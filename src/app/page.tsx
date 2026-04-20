@@ -109,8 +109,8 @@ export default function Dashboard() {
                   <CardContent>
                     <div className="text-2xl font-bold">{stat.value}</div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                      <TrendingUp className="h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">Updated live</span>
+                      {/* <TrendingUp className="h-3 w-3 text-emerald-500" />
+                      <span className="text-emerald-500 font-medium">Updated live</span> */}
                     </div>
                   </CardContent>
                 </Card>
